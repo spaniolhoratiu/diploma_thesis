@@ -1,0 +1,11 @@
+.vs/
+Videos/
+lab2_input/
+lab6_input/
+points*.txt
+prs_res_Hough/
+reconstruct.txt
+correlationMatrix.*
+covarianceMatrix.*
+Images/
+doc/

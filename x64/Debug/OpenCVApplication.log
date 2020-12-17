@@ -1,0 +1,262 @@
+﻿  OpenCVApplication.cpp
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(685): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(686): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(687): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(745): warning C4305: 'initializing': truncation from 'double' to 'float'
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(820): warning C4305: 'initializing': truncation from 'double' to 'float'
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(891): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(893): warning C4244: '=': conversion from 'double' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(894): warning C4244: '=': conversion from 'double' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(895): warning C4244: '=': conversion from 'double' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(896): warning C4244: '=': conversion from 'double' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(947): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(948): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(973): warning C4305: '+=': truncation from 'double' to 'float'
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(976): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1005): warning C4305: '*=': truncation from 'double' to 'float'
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1012): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1035): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1036): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1279): warning C4101: 'neighbors': unreferenced local variable
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1505): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1505): note: consider using '%zd' in the format string
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1505): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'unsigned __int64'
+  d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1505): note: consider using '%zd' in the format string
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1422): warning C4101: 'startingIndex': unreferenced local variable
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(1951): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2087): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2088): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2113): warning C4305: '+=': truncation from 'double' to 'float'
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2116): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2336): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2336): note: consider using '%zd' in the format string
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2343): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2343): note: consider using '%zd' in the format string
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2532): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2561): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2590): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2611): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2359): warning C4101: 'neighbors': unreferenced local variable
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2652): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2654): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2661): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2679): warning C4244: '=': conversion from 'double' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2732): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2742): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2801): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2816): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2833): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2853): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2982): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(2989): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3024): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3050): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3058): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3071): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3107): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3125): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3154): warning C4244: '+=': conversion from '_Tp' to 'float', possible loss of data
+          with
+          [
+              _Tp=double
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3193): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3200): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3227): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3303): warning C4244: '/=': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3305): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3356): warning C4244: '=': conversion from '_Tp' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+          and
+          [
+              _Tp=uchar
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3375): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3385): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3513): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3514): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3523): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3549): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3550): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3594): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3595): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3604): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3618): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3626): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3627): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3632): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3633): warning C4244: 'argument': conversion from 'float' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3647): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3668): warning C4305: 'initializing': truncation from 'double' to 'float'
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3669): warning C4305: 'initializing': truncation from 'double' to 'float'
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3700): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3701): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3739): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(3769): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4011): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4012): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4015): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4016): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4106): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4132): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4159): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4190): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4193): warning C4244: 'argument': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=double
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4093): warning C4101: 'height': unreferenced local variable
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4094): warning C4101: 'width': unreferenced local variable
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4219): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4282): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4283): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4284): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4369): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4370): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4371): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4444): warning C4244: '=': conversion from 'int' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4450): warning C4244: '=': conversion from 'int' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4456): warning C4244: '=': conversion from 'int' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4514): warning C4244: '=': conversion from 'int' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4520): warning C4244: '=': conversion from 'int' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4526): warning C4244: '=': conversion from 'int' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4555): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4583): warning C4244: '+=': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4587): warning C4244: '+=': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(4614): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(5160): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(5161): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(5230): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  d:\facultate\an iii\semester 2\image processing\opencvapplication-vs2017_ocv340_basic\opencvapplication.cpp(5230): note: consider using '%zd' in the format string
+  OpenCVApplication.vcxproj -> D:\Facultate\AN III\Semester 2\Image Processing\OpenCVApplication-VS2017_OCV340_basic\x64\Debug\OpenCVApplication.exe
+  OpenCV\dll\Debug\opencv_ffmpeg340_64.dll
+  OpenCV\dll\Debug\opencv_world340d.dll
+          2 file(s) copied.
