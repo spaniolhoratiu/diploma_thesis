@@ -11,6 +11,9 @@
 #include <iostream>
 #include <stdio.h>
 
+const int WHITE = 255;
+const int BLACK = 0;
+
 void testOpenImage()
 {
 	char fname[MAX_PATH];
@@ -5158,12 +5161,18 @@ Mat thresholdImage(Mat src, int thresholdValue)
 	return thresholdedImage;
 }
 
-Mat computeCentersOfMass(Mat labeled, std::vector<Vec3b> colorsVector)
+struct CenterOfMassInformation {
+	Mat image;
+	std::vector<Point> points;
+};
+
+CenterOfMassInformation computeCentersOfMass(Mat labeled, std::vector<Vec3b> colorsVector)
 {
 	const int WHITE = 255;
 	int height = labeled.rows;
 	int width = labeled.cols;
 	Mat centerOfMassImage(labeled.rows, labeled.cols, CV_8UC1, Scalar(0,0,0));
+	std::vector<Point> centersOfMass;
 
 	for (int k = 0; k < colorsVector.size(); k++)
 	{
@@ -5198,9 +5207,14 @@ Mat computeCentersOfMass(Mat labeled, std::vector<Vec3b> colorsVector)
 		centerMassRow = ((1.0f / area) * centerMassRow);
 		centerMassColumn = ((1.0f / area) * centerMassColumn);
 
+		centersOfMass.push_back(Point(centerMassColumn, centerMassRow));
 		centerOfMassImage.at<uchar>(centerMassRow, centerMassColumn) = WHITE;
 	}
-	return centerOfMassImage;
+
+	CenterOfMassInformation info;
+	info.image = centerOfMassImage;
+	info.points = centersOfMass;
+	return info;
 }
 
 
@@ -5248,6 +5262,9 @@ Mat computeLabelsMatrixBFS(Mat src)
 	return labels;
 }
 
+std::vector<std::vector<Point>> inputCombinations;
+std::vector<std::vector<Point>> constellationCombinations;
+std::vector<Point> combination;
 
 void thesis()
 {
@@ -5275,23 +5292,115 @@ void thesis()
 		std::vector<Vec3b> colorsOfObjects = computeObjectsColorsBlackBackground(labeledImage);
 		printf("Number of stars: %d\n", colorsOfObjects.size());
 
-		Mat centersOfMassImage = computeCentersOfMass(labeledImage, colorsOfObjects);
-		imshow("Centers of mass", centersOfMassImage);
+		CenterOfMassInformation centerOfMassInformation = computeCentersOfMass(labeledImage, colorsOfObjects);
+		imshow("Centers of mass", centerOfMassInformation.image);
+
+		printf("Centers of mass:");
+		for (int i = 0; i < centerOfMassInformation.points.size(); i++)
+		{
+			printf("\nx=%d y=%d", centerOfMassInformation.points[i].x, centerOfMassInformation.points[i].y);
+		}
+
+
 	}
 
+}
+
+Mat dilateNTimesWithParams(Mat src, int n, int objectValue, int backgroundValue)
+{
+	int height = src.rows;
+	int width = src.cols;
+	Mat newSource = src.clone();
+
+	Mat dst(height, width, CV_8UC1, RGB(backgroundValue, backgroundValue, backgroundValue));
+	int di[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+	int dj[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+	const int OBJECT_PIXEL = objectValue;
+
+	for (int nTimes = 0; nTimes < n; nTimes++)
+	{
+		for (int i = 1; i < height - 1; i++)
+		{
+			for (int j = 1; j < width - 1; j++)
+			{
+				if (newSource.at<uchar>(i, j) == OBJECT_PIXEL)
+				{
+					dst.at<uchar>(i, j) = OBJECT_PIXEL;
+					for (int k = 0; k < 8; k++)
+					{
+						dst.at<uchar>(i + di[k], j + dj[k]) = OBJECT_PIXEL;
+					}
+				}
+			}
+		}
+
+		newSource = dst.clone();
+	}
+
+	return dst;
+}
+
+Mat erodeNTimesWithParams(Mat src, int n, int objectValue, int backgroundValue)
+{
+	int height = src.rows;
+	int width = src.cols;
+	Mat newSource = src.clone();
+
+	Mat dst(height, width, CV_8UC1, RGB(backgroundValue, backgroundValue, backgroundValue));
+	int di[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
+	int dj[8] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+	const int OBJECT_PIXEL = objectValue;
+	const int BACKGROUND_PIXEL = backgroundValue;
+	bool allObjectPixels = false;
+	bool oneBGPixelFound = false;
+
+	for (int nTimes = 0; nTimes < n; nTimes++)
+	{
+		for (int i = 1; i < height - 1; i++)
+		{
+			for (int j = 1; j < width - 1; j++)
+			{
+				if (newSource.at<uchar>(i, j) == OBJECT_PIXEL)
+				{
+					for (int k = 0; k < 8; k++)
+					{
+						if (newSource.at<uchar>(i + di[k], j + dj[k]) == BACKGROUND_PIXEL)
+						{
+							oneBGPixelFound = true;
+							break;
+						}
+					}
+
+					if (!oneBGPixelFound)
+					{
+						dst.at<uchar>(i, j) = OBJECT_PIXEL;
+					}
+					else
+					{
+						dst.at<uchar>(i, j) = BACKGROUND_PIXEL;
+					}
+				}
+				else
+				{
+					dst.at<uchar>(i, j) = BACKGROUND_PIXEL;
+				}
+
+				oneBGPixelFound = false;
+			}
+		}
+
+
+		newSource = dst.clone();
+	}
+
+	return dst;
 }
 
 
 
 
-void testConstellationPreprocessingOnSelectedImage()
+Mat filterForStars(Mat src)
 {
-	char fname[MAX_PATH];
-	Mat src;
-	int di[8] = { -1, 0, 1, 0, -1, 1, -1, 1 };
-	int dj[8] = { 0, -1, 0, 1, 1, -1, -1, 1 };
-	uchar neighbors[8];
-
 	const int BLUE_BRIGHT_VALUE = 19;
 	const int GREEN_BRIGHT_VALUE = 71;
 	const int RED_BRIGHT_VALUE = 179;
@@ -5300,52 +5409,252 @@ void testConstellationPreprocessingOnSelectedImage()
 	const int GREEN_VARIATION = 20;
 	const int RED_VARIATION = 70;
 
-	const Vec3b BLACK_VEC3B = Vec3b(0, 0, 0);
-	const Vec3b WHITE_VEC3B = Vec3b(255, 255, 255);
-	const uchar WHITE = 255;
+	Mat filtered(src.rows, src.cols, CV_8UC1, Scalar(BLACK, BLACK, BLACK));
+	for (int i = 0; i < src.rows; i++)
+	{
+		for (int j = 0; j < src.cols; j++)
+		{
+			Vec3b currentPixel = src.at<Vec3b>(i, j);
 
+			if (currentPixel[0] > BLUE_BRIGHT_VALUE - BLUE_VARIATION
+				&& currentPixel[0] < BLUE_BRIGHT_VALUE + BLUE_VARIATION
+				&& currentPixel[1] > GREEN_BRIGHT_VALUE - GREEN_VARIATION
+				&& currentPixel[1] < GREEN_BRIGHT_VALUE + GREEN_VARIATION
+				&& currentPixel[2] > RED_BRIGHT_VALUE - RED_VARIATION
+				&& currentPixel[2] < RED_BRIGHT_VALUE + RED_VARIATION)
+			{
+				filtered.at<uchar>(i, j) = WHITE;
+			}
+		}
+	}
+	return filtered;
+}
+
+void generateCombinationsInput(int offset, int k, std::vector<Point> source) {
+	if (k == 0) {
+		inputCombinations.push_back(combination);
+		return;
+	}
+	for (int i = offset; i <= source.size() - k; ++i) {
+		combination.push_back(source[i]);
+		generateCombinationsInput(i + 1, k - 1, source);
+		combination.pop_back();
+	}
+}
+
+void generateCombinationsConstellation(int offset, int k, std::vector<Point> source) {
+	if (k == 0) {
+		constellationCombinations.push_back(combination);
+		return;
+	}
+	for (int i = offset; i <= source.size() - k; ++i) {
+		combination.push_back(source[i]);
+		generateCombinationsConstellation(i + 1, k - 1, source);
+		combination.pop_back();
+	}
+}
+
+struct Triangle {
+	std::vector<Point> points;
+	double distances[3];
+	void computeDistances() 
+	{
+		double d1 = sqrt(pow((points[0].x - points[1].x), 2) + pow((points[0].y - points[1].y), 2));
+		double d2 = sqrt(pow((points[0].x - points[2].x), 2) + pow((points[0].y - points[2].y), 2));
+		double d3 = sqrt(pow((points[1].x - points[2].x), 2) + pow((points[1].y - points[2].y), 2));
+		
+		double minDistance = min(min(d1, d2), d3);
+
+		d1 /= minDistance;
+		d2 /= minDistance;
+		d3 /= minDistance;
+
+		std::vector<double> distancesAux;
+		distancesAux.push_back(d1);
+		distancesAux.push_back(d2);
+		distancesAux.push_back(d3);
+
+		sort(distancesAux.begin(), distancesAux.end());
+		
+		distances[0] = distancesAux[0];
+		distances[1] = distancesAux[1];
+		distances[2] = distancesAux[2];
+	}
+};
+
+void printTrianglesInFile(std::vector<Triangle> triangles)
+{
+	FILE* fp;
+	fp = fopen("test2.txt", "w+");
+	if (fp == NULL)
+	{
+		printf("Error opening file.\n");
+	}
+	else
+	{
+		int numberOfTriangles = triangles.size();
+		fprintf(fp, "%d", numberOfTriangles);
+		
+		//for (int i = 0; i < triangles.size(); i++)
+		//{
+		//	fprintf(fp, "%lf %lf %lf", triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
+		//}
+
+		fclose(fp);
+	}
+}
+
+void testing()
+{
+	FILE* fp;
+	fp = fopen("test1.txt", "w");
+	if (fp == NULL)
+	{
+		printf("Error opening file.\n");
+	}
+	else
+	{
+		fprintf(fp, "%d", 1);
+		fclose(fp);
+	}
+
+}
+
+
+void testConstellationPreprocessingOnSelectedImage()
+{
+	char fname[MAX_PATH];
+	Mat src;
 
 	while (openFileDlg(fname))
 	{
 		src = imread(fname, IMREAD_COLOR);
 		imshow("Source", src);
 
-		Mat starsOnly(src.rows, src.cols, CV_8UC1, Scalar(0,0,0));
-
-		for (int i = 0; i < src.rows; i++)
-		{
-			for (int j = 0; j < src.cols; j++)
-			{
-				Vec3b currentPixel = src.at<Vec3b>(i, j);
-
-				if (currentPixel[0] > BLUE_BRIGHT_VALUE - BLUE_VARIATION
-					&& currentPixel[0] < BLUE_BRIGHT_VALUE + BLUE_VARIATION
-					&& currentPixel[1] > GREEN_BRIGHT_VALUE - GREEN_VARIATION
-					&& currentPixel[1] < GREEN_BRIGHT_VALUE + GREEN_VARIATION
-					&& currentPixel[2] > RED_BRIGHT_VALUE - RED_VARIATION
-					&& currentPixel[2] < RED_BRIGHT_VALUE + RED_VARIATION)
-				{
-					starsOnly.at<uchar>(i, j) = WHITE;
-				}
-
-			}
-		}
-
+		Mat starsOnly = filterForStars(src);
 		imshow("Stars only", starsOnly);
 
-		Mat labels = computeLabelsMatrixBFS(starsOnly);
+		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 1, WHITE, BLACK);
+		//erosionDilation = dilateNTimesWithParams(erosionDilation, 1, WHITE, BLACK);
+		//imshow("Erosion & Dilation", erosionDilation);
+		Mat erosionDilation = starsOnly;
+
+		Mat labels = computeLabelsMatrixBFS(erosionDilation);
 
 		Mat labeledImage = computeLabeledImage(labels);
 		imshow("Labeled", labeledImage);
 		std::vector<Vec3b> colorsOfObjects = computeObjectsColorsBlackBackground(labeledImage);
 		printf("Number of stars: %d\n", colorsOfObjects.size());
 
-		Mat centersOfMassImage = computeCentersOfMass(labeledImage, colorsOfObjects);
-		imshow("Centers of mass", centersOfMassImage);
+		CenterOfMassInformation centerOfMassInformation = computeCentersOfMass(labeledImage, colorsOfObjects);
+		imshow("Centers of mass", centerOfMassInformation.image);
+
+		/*
+		printf("Centers of mass:");
+		for (int i = 0; i < centerOfMassInformation.points.size(); i++)
+		{
+			printf("\nx=%d y=%d", centerOfMassInformation.points[i].x, centerOfMassInformation.points[i].y);
+		}
+		*/
+
+		generateCombinationsConstellation(0, 3, centerOfMassInformation.points);
+
+		printf("Nb of combinations: %d\n", constellationCombinations.size());
+		
+		std::vector<Triangle> triangles;
+		for (int i = 0; i < constellationCombinations.size(); i++)
+		{
+			Triangle triangle;
+			triangle.points = constellationCombinations[i];
+			triangle.computeDistances();
+			triangles.push_back(triangle);
+		}
+		
+		/*printTrianglesInFile(triangles);*/
+		testing();
+		//if (fp == NULL)
+		//{
+		//	printf("Error opening file.\n");
+		//}
+		//else {
+		//	fprintf(fp, "test");
+		//	fprintf(fp, "%d", triangles.size());
+
+		//	printf("Nb of triangles = %d", triangles.size());
+		//	for (int i = 0; i < triangles.size(); i++)
+		//	{
+		//		printf("Triangle #%d\n", i);
+		//		printf("Distances: %lf %lf %lf\n", triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
+		//		fprintf(fp, "%lf %lf %lf", triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
+		//	}
+
+		//	fclose(fp);
+		//}
+		
+	}
+}
+
+void preprocessConstellations()
+{
+	char fname[MAX_PATH];
+	Mat src;
+
+	while (openFileDlg(fname))
+	{
+		src = imread(fname, IMREAD_COLOR);
+		imshow("Source", src);
+
+		Mat starsOnly = filterForStars(src);
+		imshow("Stars only", starsOnly);
+
+		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 1, WHITE, BLACK);
+		//erosionDilation = dilateNTimesWithParams(erosionDilation, 1, WHITE, BLACK);
+		//imshow("Erosion & Dilation", erosionDilation);
+		Mat erosionDilation = starsOnly;
+
+		Mat labels = computeLabelsMatrixBFS(erosionDilation);
+
+		Mat labeledImage = computeLabeledImage(labels);
+		imshow("Labeled", labeledImage);
+		std::vector<Vec3b> colorsOfObjects = computeObjectsColorsBlackBackground(labeledImage);
+		printf("Number of stars: %d\n", colorsOfObjects.size());
+
+		CenterOfMassInformation centerOfMassInformation = computeCentersOfMass(labeledImage, colorsOfObjects);
+		imshow("Centers of mass", centerOfMassInformation.image);
+
+		/*
+		printf("Centers of mass:");
+		for (int i = 0; i < centerOfMassInformation.points.size(); i++)
+		{
+			printf("\nx=%d y=%d", centerOfMassInformation.points[i].x, centerOfMassInformation.points[i].y);
+		}
+		*/
+
+		generateCombinationsConstellation(0, 3, centerOfMassInformation.points);
+
+		printf("Nb of combinations: %d\n", constellationCombinations.size());
+
+		std::vector<Triangle> triangles;
+		for (int i = 0; i < constellationCombinations.size(); i++)
+		{
+			Triangle triangle;
+			triangle.points = constellationCombinations[i];
+			triangle.computeDistances();
+			triangles.push_back(triangle);
+		}
+
+
+		printf("Nb of triangles = %d", triangles.size());
+		for (int i = 0; i < triangles.size(); i++)
+		{
+			printf("Triangle #%d\n", i);
+			printf("Distances: %lf %lf %lf\n", triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
+		}
 
 	}
-
 }
+
+
 
 
 
@@ -5398,6 +5707,7 @@ int main()
 		printf(" 100 - Project\n");
 		printf(" 123 - Thesis\n");
 		printf(" 124 - Test 1 Image Constellation Preprocessing\n");
+		printf(" 125 - Preprocess Constellation\n");
 		printf("\n\n\n===== Pattern Recognition Systems=====\n");
 		printf("-Lab 1\n");
 		printf("	38 - Least Mean Squares - Model 1\n");
@@ -5584,6 +5894,12 @@ int main()
 				break;
 			case 124:
 				testConstellationPreprocessingOnSelectedImage();
+				break;
+			case 125:
+				preprocessConstellations();
+				break;
+			case 111:
+				testing();
 				break;
 		}
 	}

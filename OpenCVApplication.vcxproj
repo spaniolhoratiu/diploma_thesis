@@ -115,6 +115,7 @@
     <Text Include="points4.txt" />
     <Text Include="points5.txt" />
     <Text Include="reconstruct.txt" />
+    <Text Include="test.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="lab2_input\points1-res.bmp" />
