@@ -4803,6 +4803,7 @@ void naiveBayesianClassifier()
 
 				if (testImage.at<uchar>(j / IMAGE_COLUMN_SIZE, j % IMAGE_COLUMN_SIZE) == 255)
 				{
+					// j = row * column_size + column_size
 					sum += log(likelihood.at<double>(i, j));
 				}
 				else
@@ -5146,7 +5147,7 @@ Mat thresholdImage(Mat src, int thresholdValue)
 {
 	const int WHITE = 255;
 
-	Mat thresholdedImage(src.rows, src.cols, RGB(0, 0, 0));
+	Mat thresholdedImage(src.rows, src.cols, CV_8UC1, Scalar(0, 0, 0));
 	for (int i = 0; i < src.rows; i++)
 	{
 		for (int j = 0; j < src.cols; j++)
@@ -5266,6 +5267,58 @@ std::vector<std::vector<Point>> inputCombinations;
 std::vector<std::vector<Point>> constellationCombinations;
 std::vector<Point> combination;
 
+struct Triangle {
+	std::vector<Point> points;
+	double distances[3];
+	void computeDistances()
+	{
+		double d1 = sqrt(pow((points[0].x - points[1].x), 2) + pow((points[0].y - points[1].y), 2));
+		double d2 = sqrt(pow((points[0].x - points[2].x), 2) + pow((points[0].y - points[2].y), 2));
+		double d3 = sqrt(pow((points[1].x - points[2].x), 2) + pow((points[1].y - points[2].y), 2));
+
+		double minDistance = min(min(d1, d2), d3);
+
+		d1 /= minDistance;
+		d2 /= minDistance;
+		d3 /= minDistance;
+
+		std::vector<double> distancesAux;
+		distancesAux.push_back(d1);
+		distancesAux.push_back(d2);
+		distancesAux.push_back(d3);
+
+		sort(distancesAux.begin(), distancesAux.end());
+
+		distances[0] = distancesAux[0];
+		distances[1] = distancesAux[1];
+		distances[2] = distancesAux[2];
+	}
+};
+
+void generateCombinationsInput(int offset, int k, std::vector<Point> source) {
+	if (k == 0) {
+		inputCombinations.push_back(combination);
+		return;
+	}
+	for (int i = offset; i <= source.size() - k; ++i) {
+		combination.push_back(source[i]);
+		generateCombinationsInput(i + 1, k - 1, source);
+		combination.pop_back();
+	}
+}
+
+void generateCombinationsConstellation(int offset, int k, std::vector<Point> source) {
+	if (k == 0) {
+		constellationCombinations.push_back(combination);
+		return;
+	}
+	for (int i = offset; i <= source.size() - k; ++i) {
+		combination.push_back(source[i]);
+		generateCombinationsConstellation(i + 1, k - 1, source);
+		combination.pop_back();
+	}
+}
+
 void thesis()
 {
 	char fname[MAX_PATH];
@@ -5278,29 +5331,147 @@ void thesis()
 	while (openFileDlg(fname))
 	{
 		src = imread(fname, IMREAD_GRAYSCALE);
-		imshow("Source", src);
+		//imshow("Source", src);
 		
 		Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
 		char buffer[50];
 		sprintf(buffer, "Thresholded at %d", BINARIZATION_THRESHOLD);
-		imshow(buffer, thresholdedImage);
-		
-		Mat labels = computeLabelsMatrixBFS(thresholdedImage);
+		//imshow(buffer, thresholdedImage);
 
+		Mat labels = computeLabelsMatrixBFS(thresholdedImage);
 		Mat labeledImage = computeLabeledImage(labels);
-		imshow("Labeled", labeledImage);
+		//imshow("Labeled", labeledImage);
+	
 		std::vector<Vec3b> colorsOfObjects = computeObjectsColorsBlackBackground(labeledImage);
-		printf("Number of stars: %d\n", colorsOfObjects.size());
+		//printf("Number of stars: %d\n", colorsOfObjects.size());
 
 		CenterOfMassInformation centerOfMassInformation = computeCentersOfMass(labeledImage, colorsOfObjects);
-		imshow("Centers of mass", centerOfMassInformation.image);
+		//imshow("Centers of mass", centerOfMassInformation.image);
+		
+		//printf("\nCenters of mass:\n");
+		//for (int i = 0; i < centerOfMassInformation.points.size(); i++)
+		//{
+		//	printf("x=%d y=%d\n", centerOfMassInformation.points[i].x, centerOfMassInformation.points[i].y);
+		//}
 
-		printf("Centers of mass:");
-		for (int i = 0; i < centerOfMassInformation.points.size(); i++)
+		std::vector<Point> inputPoints = centerOfMassInformation.points;
+		generateCombinationsInput(0, 3, inputPoints);
+		std::vector<Triangle> inputTriangles;
+
+		for (int i = 0; i < inputCombinations.size(); i++)
 		{
-			printf("\nx=%d y=%d", centerOfMassInformation.points[i].x, centerOfMassInformation.points[i].y);
+			Triangle triangle;
+			triangle.points = inputCombinations[i];
+			triangle.computeDistances();
+			inputTriangles.push_back(triangle);
 		}
 
+		std::vector<Point> constellationPoints;
+		std::vector<Triangle> constellationTriangles;
+		
+		Mat similarTriangles(centerOfMassInformation.image.rows, centerOfMassInformation.image.cols, CV_8UC3, Vec3b(0, 0, 0));
+		for (int i = 0; i < centerOfMassInformation.image.rows; i++)
+		{
+			for (int j = 0; j < centerOfMassInformation.image.cols; j++)
+			{
+				if (centerOfMassInformation.image.at<uchar>(i, j) == 255)
+				{
+					similarTriangles.at<Vec3b>(i, j) = Vec3b(255, 255, 255);
+				}
+			}
+		}
+
+		FILE* fp;
+		fp = fopen("D:\\Facultate\\AN IV\\Licenta\\data\\preprocessing_info\\constellationInfo.txt", "r");
+		if (fp == NULL)
+		{
+			printf("Error opening file.");
+		}
+		else
+		{
+			int nbOfPoints, nbOfTriangles;
+
+			fscanf(fp, "%d %d\n", &nbOfPoints, &nbOfTriangles);
+			for (int i = 0; i < nbOfPoints; i++)
+			{
+				int x, y;
+				fscanf(fp, "%d %d\n", &x, &y);
+				Point aux(x, y);
+				constellationPoints.push_back(aux);
+			}
+
+			for (int i = 0; i < nbOfTriangles; i++)
+			{
+				int x1, y1, x2, y2, x3, y3;
+				double d1, d2, d3;
+
+				fscanf(fp, "%d %d %d %d %d %d %lf %lf %lf\n",
+					&x1, &y1,
+					&x2, &y2,
+					&x3, &y3,
+					&d1, &d2, &d3
+				);
+
+				Point p1(x1, y1);
+				Point p2(x2, y2);
+				Point p3(x3, y3);
+
+				Triangle triangle;
+				triangle.points.push_back(p1);
+				triangle.points.push_back(p2);
+				triangle.points.push_back(p3);
+
+				triangle.distances[0] = d1;
+				triangle.distances[1] = d2;
+				triangle.distances[2] = d3;
+
+				constellationTriangles.push_back(triangle);
+			}
+
+			fclose(fp);
+		
+			printf("Started triangle computations...\n");
+			double smallestSum = INT_MAX;
+			Triangle inputTriangle, constellationTriangle;
+			for (int i = 0; i < inputTriangles.size(); i++)
+			{
+				for (int j = 0; j < constellationTriangles.size(); j++)
+				{
+					double sum = abs(inputTriangles[i].distances[0] - constellationTriangles[j].distances[0]) +
+						abs(inputTriangles[i].distances[1] - constellationTriangles[j].distances[1]) +
+						abs(inputTriangles[i].distances[2] - constellationTriangles[j].distances[2]);
+
+					if (sum < smallestSum)
+					{
+						smallestSum = sum;
+						inputTriangle = inputTriangles[i];
+						constellationTriangle = constellationTriangles[j];
+					}
+				}
+			}
+
+			printf("Smallest sum: %lf\n", smallestSum);
+			line(similarTriangles, inputTriangle.points[0], inputTriangle.points[1], Vec3b(0, 255, 0), 1);
+			line(similarTriangles, inputTriangle.points[0], inputTriangle.points[2], Vec3b(0, 255, 0), 1);
+			line(similarTriangles, inputTriangle.points[1], inputTriangle.points[2], Vec3b(0, 255, 0), 1);
+			similarTriangles.at<Vec3b>(inputTriangle.points[0].y, inputTriangle.points[0].x) = Vec3b(0, 0, 255);
+			similarTriangles.at<Vec3b>(inputTriangle.points[1].y, inputTriangle.points[1].x) = Vec3b(0, 0, 255);
+			similarTriangles.at<Vec3b>(inputTriangle.points[2].y, inputTriangle.points[2].x) = Vec3b(0, 0, 255);
+
+			imshow("Similar Triangles Input", similarTriangles);
+
+			Mat constellationTriangles = imread("D:\\Facultate\\AN IV\\Licenta\\data\\constellations\\png\\constellation11.png", IMREAD_COLOR);
+			line(constellationTriangles, constellationTriangle.points[0], constellationTriangle.points[1], Vec3b(0, 255, 0), 1);
+			line(constellationTriangles, constellationTriangle.points[0], constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
+			line(constellationTriangles, constellationTriangle.points[1], constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
+			constellationTriangles.at<Vec3b>(constellationTriangle.points[0].y, constellationTriangle.points[0].x) = Vec3b(0, 0, 255);
+			constellationTriangles.at<Vec3b>(constellationTriangle.points[1].y, constellationTriangle.points[1].x) = Vec3b(0, 0, 255);
+			constellationTriangles.at<Vec3b>(constellationTriangle.points[2].y, constellationTriangle.points[2].x) = Vec3b(0, 0, 255);
+
+			imshow("Similar Triangles Constellation", constellationTriangles);
+		}
+
+		//printf("Constellation points = %d\nConstellation triangles= %d\n", constellationPoints.size(), constellationTriangles.size());
 
 	}
 
@@ -5396,9 +5567,6 @@ Mat erodeNTimesWithParams(Mat src, int n, int objectValue, int backgroundValue)
 	return dst;
 }
 
-
-
-
 Mat filterForStars(Mat src)
 {
 	const int BLUE_BRIGHT_VALUE = 19;
@@ -5430,75 +5598,36 @@ Mat filterForStars(Mat src)
 	return filtered;
 }
 
-void generateCombinationsInput(int offset, int k, std::vector<Point> source) {
-	if (k == 0) {
-		inputCombinations.push_back(combination);
-		return;
-	}
-	for (int i = offset; i <= source.size() - k; ++i) {
-		combination.push_back(source[i]);
-		generateCombinationsInput(i + 1, k - 1, source);
-		combination.pop_back();
-	}
-}
 
-void generateCombinationsConstellation(int offset, int k, std::vector<Point> source) {
-	if (k == 0) {
-		constellationCombinations.push_back(combination);
-		return;
-	}
-	for (int i = offset; i <= source.size() - k; ++i) {
-		combination.push_back(source[i]);
-		generateCombinationsConstellation(i + 1, k - 1, source);
-		combination.pop_back();
-	}
-}
 
-struct Triangle {
-	std::vector<Point> points;
-	double distances[3];
-	void computeDistances() 
-	{
-		double d1 = sqrt(pow((points[0].x - points[1].x), 2) + pow((points[0].y - points[1].y), 2));
-		double d2 = sqrt(pow((points[0].x - points[2].x), 2) + pow((points[0].y - points[2].y), 2));
-		double d3 = sqrt(pow((points[1].x - points[2].x), 2) + pow((points[1].y - points[2].y), 2));
-		
-		double minDistance = min(min(d1, d2), d3);
-
-		d1 /= minDistance;
-		d2 /= minDistance;
-		d3 /= minDistance;
-
-		std::vector<double> distancesAux;
-		distancesAux.push_back(d1);
-		distancesAux.push_back(d2);
-		distancesAux.push_back(d3);
-
-		sort(distancesAux.begin(), distancesAux.end());
-		
-		distances[0] = distancesAux[0];
-		distances[1] = distancesAux[1];
-		distances[2] = distancesAux[2];
-	}
-};
-
-void printTrianglesInFile(std::vector<Triangle> triangles)
+void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangle> triangles)
 {
 	FILE* fp;
-	fp = fopen("test2.txt", "w+");
+	fp = fopen("D:\\Facultate\\AN IV\\Licenta\\data\\preprocessing_info\\constellationInfo.txt", "w+");
 	if (fp == NULL)
 	{
 		printf("Error opening file.\n");
 	}
 	else
 	{
+		int numberOfPoints = points.size();
 		int numberOfTriangles = triangles.size();
-		fprintf(fp, "%d", numberOfTriangles);
 		
-		//for (int i = 0; i < triangles.size(); i++)
-		//{
-		//	fprintf(fp, "%lf %lf %lf", triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
-		//}
+		fprintf(fp, "%d %d\n", numberOfPoints, numberOfTriangles);
+		
+		for (int i = 0; i < points.size(); i++)
+		{
+			fprintf(fp, "%d %d\n", points[i].x, points[i].y);
+		}
+
+		for (int i = 0; i < triangles.size(); i++)
+		{
+			fprintf(fp, "%d %d %d %d %d %d %lf %lf %lf\n",
+				triangles[i].points[0].x, triangles[i].points[0].y,
+				triangles[i].points[1].x, triangles[i].points[1].y,
+				triangles[i].points[2].x, triangles[i].points[2].y,
+				triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
+		}
 
 		fclose(fp);
 	}
@@ -5507,14 +5636,15 @@ void printTrianglesInFile(std::vector<Triangle> triangles)
 void testing()
 {
 	FILE* fp;
-	fp = fopen("test1.txt", "w");
+	fp = fopen("test1.txt", "w+");
 	if (fp == NULL)
 	{
 		printf("Error opening file.\n");
 	}
 	else
 	{
-		fprintf(fp, "%d", 1);
+		int abcd = 10;
+		fprintf(fp, "%d", abcd);
 		fclose(fp);
 	}
 
@@ -5570,27 +5700,8 @@ void testConstellationPreprocessingOnSelectedImage()
 			triangles.push_back(triangle);
 		}
 		
-		/*printTrianglesInFile(triangles);*/
-		testing();
-		//if (fp == NULL)
-		//{
-		//	printf("Error opening file.\n");
-		//}
-		//else {
-		//	fprintf(fp, "test");
-		//	fprintf(fp, "%d", triangles.size());
-
-		//	printf("Nb of triangles = %d", triangles.size());
-		//	for (int i = 0; i < triangles.size(); i++)
-		//	{
-		//		printf("Triangle #%d\n", i);
-		//		printf("Distances: %lf %lf %lf\n", triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
-		//		fprintf(fp, "%lf %lf %lf", triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
-		//	}
-
-		//	fclose(fp);
-		//}
-		
+		writeConstellationInfoInFile(centerOfMassInformation.points, triangles);
+			
 	}
 }
 
