@@ -5272,6 +5272,11 @@ struct Triangle {
 	double distances[3];
 	void computeDistances()
 	{
+		// TODO: hold distance + points of distance
+		// TODO: when sorting, keep continuity of points (p1 -> p3, p2 -> p3 becomes p1 -> p3, p3 -> p2)
+		// Transformare afina
+		// Warp constellation and check 
+
 		double d1 = sqrt(pow((points[0].x - points[1].x), 2) + pow((points[0].y - points[1].y), 2));
 		double d2 = sqrt(pow((points[0].x - points[2].x), 2) + pow((points[0].y - points[2].y), 2));
 		double d3 = sqrt(pow((points[1].x - points[2].x), 2) + pow((points[1].y - points[2].y), 2));
@@ -5331,7 +5336,7 @@ void thesis()
 	while (openFileDlg(fname))
 	{
 		src = imread(fname, IMREAD_GRAYSCALE);
-		//imshow("Source", src);
+		imshow("Source", src);
 		
 		Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
 		char buffer[50];
