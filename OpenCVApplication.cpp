@@ -10,6 +10,7 @@
 #include <vector>
 #include <iostream>
 #include <stdio.h>
+#include <algorithm>
 
 const int WHITE = 255;
 const int BLACK = 0;
@@ -5267,9 +5268,27 @@ std::vector<std::vector<Point>> inputCombinations;
 std::vector<std::vector<Point>> constellationCombinations;
 std::vector<Point> combination;
 
+struct Distance {
+	Point p1;
+	Point p2;
+	double value;
+
+	void swapPoints() {
+		Point aux = p1;
+		p1 = p2;
+		p2 = aux;
+	}
+	
+	bool operator <(const Distance& a) const
+	{
+		return value < a.value;
+	}
+};
+
 struct Triangle {
 	std::vector<Point> points;
-	double distances[3];
+	std::vector<Distance> distances;
+	//double distances[3];
 	void computeDistances()
 	{
 		// TODO: hold distance + points of distance
@@ -5277,26 +5296,56 @@ struct Triangle {
 		// Transformare afina
 		// Warp constellation and check 
 
-		double d1 = sqrt(pow((points[0].x - points[1].x), 2) + pow((points[0].y - points[1].y), 2));
-		double d2 = sqrt(pow((points[0].x - points[2].x), 2) + pow((points[0].y - points[2].y), 2));
-		double d3 = sqrt(pow((points[1].x - points[2].x), 2) + pow((points[1].y - points[2].y), 2));
+		double d1Value = sqrt(pow((points[0].x - points[1].x), 2) + pow((points[0].y - points[1].y), 2));
+		double d2Value = sqrt(pow((points[0].x - points[2].x), 2) + pow((points[0].y - points[2].y), 2));
+		double d3Value = sqrt(pow((points[1].x - points[2].x), 2) + pow((points[1].y - points[2].y), 2));
+		
+		double minDistance = min(min(d1Value, d2Value), d3Value);
+		
+		d1Value /= minDistance;
+		d2Value /= minDistance;
+		d3Value /= minDistance;
 
-		double minDistance = min(min(d1, d2), d3);
+		Distance d1;
+		d1.value = d1Value;
+		d1.p1 = points[0];
+		d1.p2 = points[1];
 
-		d1 /= minDistance;
-		d2 /= minDistance;
-		d3 /= minDistance;
+		Distance d2;
+		d2.value = d2Value;
+		d2.p1 = points[0];
+		d2.p2 = points[2];
 
-		std::vector<double> distancesAux;
-		distancesAux.push_back(d1);
-		distancesAux.push_back(d2);
-		distancesAux.push_back(d3);
+		Distance d3;
+		d3.value = d3Value;
+		d3.p1 = points[1];
+		d3.p2 = points[2];
 
-		sort(distancesAux.begin(), distancesAux.end());
+		distances.push_back(d1);
+		distances.push_back(d2);
+		distances.push_back(d3);
 
-		distances[0] = distancesAux[0];
-		distances[1] = distancesAux[1];
-		distances[2] = distancesAux[2];
+		sort(distances.begin(), distances.end());
+
+		if (distances[0].p1 == distances[1].p1) // ab ac XX -> ba ac XX
+		{
+			distances[0].swapPoints();
+		}
+		else if(distances[0].p1 == distances[1].p2) { // ab ca XX -> ba ac XX
+			distances[0].swapPoints();
+			distances[1].swapPoints();
+		}
+		else if (distances[0].p2 == distances[1].p1) { // ba ac
+			// Nothing
+		}
+		else if (distances[0].p2 == distances[1].p2) { // ba ca 
+			distances[1].swapPoints();
+		}
+
+		if (distances[1].p2 == distances[2].p2) // XX ac bc -> XX ac cb
+		{
+			distances[2].swapPoints();
+		}
 	}
 };
 
@@ -5396,41 +5445,45 @@ void thesis()
 		{
 			int nbOfPoints, nbOfTriangles;
 
-			fscanf(fp, "%d %d\n", &nbOfPoints, &nbOfTriangles);
+			fscanf(fp, "%d %d", &nbOfPoints, &nbOfTriangles);
 			for (int i = 0; i < nbOfPoints; i++)
 			{
 				int x, y;
-				fscanf(fp, "%d %d\n", &x, &y);
+				fscanf(fp, "\n%d %d", &x, &y);
 				Point aux(x, y);
 				constellationPoints.push_back(aux);
 			}
 
 			for (int i = 0; i < nbOfTriangles; i++)
 			{
-				int x1, y1, x2, y2, x3, y3;
-				double d1, d2, d3;
+				fscanf(fp, "\n");
 
-				fscanf(fp, "%d %d %d %d %d %d %lf %lf %lf\n",
-					&x1, &y1,
-					&x2, &y2,
-					&x3, &y3,
-					&d1, &d2, &d3
-				);
+				Triangle currentTriangle;
+				currentTriangle.points = constellationPoints;
+				
+				for (int j = 0; j < 3; j++)
+				{
+					int x1, y1, x2, y2;
+					double d;
 
-				Point p1(x1, y1);
-				Point p2(x2, y2);
-				Point p3(x3, y3);
+					fscanf(fp, "%d %d %d %d %lf ", &x1, &y1, &x2, &y2, &d);
+					Point p1;
+					p1.x = x1;
+					p1.y = y1;
 
-				Triangle triangle;
-				triangle.points.push_back(p1);
-				triangle.points.push_back(p2);
-				triangle.points.push_back(p3);
+					Point p2;
+					p2.x = x2;
+					p2.y = y2;
 
-				triangle.distances[0] = d1;
-				triangle.distances[1] = d2;
-				triangle.distances[2] = d3;
+					Distance dist;
+					dist.p1 = p1;
+					dist.p2 = p2;
+					dist.value = d;
 
-				constellationTriangles.push_back(triangle);
+					currentTriangle.distances[j] = dist;
+				}
+
+				constellationTriangles.push_back(currentTriangle);
 			}
 
 			fclose(fp);
@@ -5442,9 +5495,9 @@ void thesis()
 			{
 				for (int j = 0; j < constellationTriangles.size(); j++)
 				{
-					double sum = abs(inputTriangles[i].distances[0] - constellationTriangles[j].distances[0]) +
-						abs(inputTriangles[i].distances[1] - constellationTriangles[j].distances[1]) +
-						abs(inputTriangles[i].distances[2] - constellationTriangles[j].distances[2]);
+					double sum = abs(inputTriangles[i].distances[0].value - constellationTriangles[j].distances[0].value) +
+						abs(inputTriangles[i].distances[1].value - constellationTriangles[j].distances[1].value) +
+						abs(inputTriangles[i].distances[2].value - constellationTriangles[j].distances[2].value);
 
 					if (sum < smallestSum)
 					{
@@ -5476,7 +5529,7 @@ void thesis()
 			imshow("Similar Triangles Constellation", constellationTriangles);
 		}
 
-		//printf("Constellation points = %d\nConstellation triangles= %d\n", constellationPoints.size(), constellationTriangles.size());
+		printf("Constellation points = %d\nConstellation triangles= %d\n", constellationPoints.size(), constellationTriangles.size());
 
 	}
 
@@ -5618,20 +5671,23 @@ void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangl
 		int numberOfPoints = points.size();
 		int numberOfTriangles = triangles.size();
 		
-		fprintf(fp, "%d %d\n", numberOfPoints, numberOfTriangles);
+		fprintf(fp, "%d %d", numberOfPoints, numberOfTriangles);
 		
 		for (int i = 0; i < points.size(); i++)
 		{
-			fprintf(fp, "%d %d\n", points[i].x, points[i].y);
+			fprintf(fp, "\n%d %d ", points[i].x, points[i].y);
 		}
 
 		for (int i = 0; i < triangles.size(); i++)
 		{
-			fprintf(fp, "%d %d %d %d %d %d %lf %lf %lf\n",
-				triangles[i].points[0].x, triangles[i].points[0].y,
-				triangles[i].points[1].x, triangles[i].points[1].y,
-				triangles[i].points[2].x, triangles[i].points[2].y,
-				triangles[i].distances[0], triangles[i].distances[1], triangles[i].distances[2]);
+			fprintf(fp, "\n");
+			for (int j = 0; j < 3; j++)
+			{
+				fprintf(fp, "%d %d %d %d %lf ",
+					triangles[i].distances[j].p1.x, triangles[i].distances[j].p1.y,
+					triangles[i].distances[j].p2.x, triangles[i].distances[j].p2.y,
+					triangles[i].distances[j].value);
+			}
 		}
 
 		fclose(fp);
