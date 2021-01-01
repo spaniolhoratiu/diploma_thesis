@@ -5273,6 +5273,12 @@ struct Distance {
 	Point p2;
 	double value;
 
+	Distance(Point point1, Point point2, double v) {
+		p1 = point1;
+		p2 = point2;
+		value = v;
+	}
+
 	void swapPoints() {
 		Point aux = p1;
 		p1 = p2;
@@ -5306,21 +5312,10 @@ struct Triangle {
 		d2Value /= minDistance;
 		d3Value /= minDistance;
 
-		Distance d1;
-		d1.value = d1Value;
-		d1.p1 = points[0];
-		d1.p2 = points[1];
-
-		Distance d2;
-		d2.value = d2Value;
-		d2.p1 = points[0];
-		d2.p2 = points[2];
-
-		Distance d3;
-		d3.value = d3Value;
-		d3.p1 = points[1];
-		d3.p2 = points[2];
-
+		Distance d1(points[0], points[1], d1Value);
+		Distance d2(points[0], points[2], d2Value);
+		Distance d3(points[1], points[2], d3Value);
+	
 		distances.push_back(d1);
 		distances.push_back(d2);
 		distances.push_back(d3);
@@ -5444,44 +5439,34 @@ void thesis()
 		else
 		{
 			int nbOfPoints, nbOfTriangles;
-
 			fscanf(fp, "%d %d", &nbOfPoints, &nbOfTriangles);
+
 			for (int i = 0; i < nbOfPoints; i++)
 			{
 				int x, y;
-				fscanf(fp, "\n%d %d", &x, &y);
-				Point aux(x, y);
-				constellationPoints.push_back(aux);
+				fscanf(fp, "%d %d", &x, &y);
+				constellationPoints.push_back(Point(x,y));
 			}
 
 			for (int i = 0; i < nbOfTriangles; i++)
 			{
-				fscanf(fp, "\n");
-
 				Triangle currentTriangle;
 				currentTriangle.points = constellationPoints;
+
+				int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
+				double d1, d2, d3;	
+				fscanf(fp, "%d %d %d %d %lf %d %d %d %d %lf %d %d %d %d %lf",
+					&x1, &y1, &x2, &y2, &d1,
+					&x3, &y3, &x4, &y4, &d2,
+					&x5, &y5, &x6, &y6, &d3);
+
+				Distance distance1(Point(x1, y1), Point(x2, y2), d1);
+				Distance distance2(Point(x3, y3), Point(x4, y4), d2);
+				Distance distance3(Point(x5, y5), Point(x6, y6), d3);
 				
-				for (int j = 0; j < 3; j++)
-				{
-					int x1, y1, x2, y2;
-					double d;
-
-					fscanf(fp, "%d %d %d %d %lf ", &x1, &y1, &x2, &y2, &d);
-					Point p1;
-					p1.x = x1;
-					p1.y = y1;
-
-					Point p2;
-					p2.x = x2;
-					p2.y = y2;
-
-					Distance dist;
-					dist.p1 = p1;
-					dist.p2 = p2;
-					dist.value = d;
-
-					currentTriangle.distances[j] = dist;
-				}
+				currentTriangle.distances.push_back(distance1);
+				currentTriangle.distances.push_back(distance2);
+				currentTriangle.distances.push_back(distance3);
 
 				constellationTriangles.push_back(currentTriangle);
 			}
@@ -5490,6 +5475,8 @@ void thesis()
 		
 			printf("Started triangle computations...\n");
 			double smallestSum = INT_MAX;
+			double const TRIANGLE_DIFFERENCE_THRESHOLD = INT_MAX;
+			
 			Triangle inputTriangle, constellationTriangle;
 			for (int i = 0; i < inputTriangles.size(); i++)
 			{
@@ -5656,8 +5643,6 @@ Mat filterForStars(Mat src)
 	return filtered;
 }
 
-
-
 void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangle> triangles)
 {
 	FILE* fp;
@@ -5710,7 +5695,6 @@ void testing()
 	}
 
 }
-
 
 void testConstellationPreprocessingOnSelectedImage()
 {
@@ -5825,9 +5809,6 @@ void preprocessConstellations()
 
 	}
 }
-
-
-
 
 
 int main()
