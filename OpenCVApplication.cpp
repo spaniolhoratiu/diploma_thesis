@@ -3778,7 +3778,7 @@ void houghTransform()
 		int height = src.rows;
 		int width = src.cols;
 
-		int D = sqrt(pow(height, 2) + pow(width, 2));
+		int D = sqrt(pow(height, 2) + pow(width, 2)); // Diagonal of image
 
 		const int maxNumberOfPoints = 1000;
 		int xCoordinates[maxNumberOfPoints], yCoordinates[maxNumberOfPoints];
@@ -3939,7 +3939,7 @@ void distanceTransformPatternMatching()
 		for (int i = height - 2; i >= 0; i--)
 		{
 			for (int j = width - 2; j >= 1; j--)
-			{
+			{	
 				int min = distanceTransform.at<uchar>(i, j);
 				for (int k = 4; k < 8; k++)
 				{
@@ -4265,7 +4265,7 @@ void kMeansClustering()
 		src = imread(fname, IMREAD_GRAYSCALE);
 		int numberOfFeatures = 2; // a.k.a. d
 
-		const int numberOfClusters = 3; // a.k.a. K
+		const int numberOfClusters = 5; // a.k.a. K
 							   
 		int numberOfPoints = 0;
 		const int NUMBER_OF_POINTS_OCHIOMETRIC = 10000;
@@ -4374,7 +4374,7 @@ void kMeansClustering()
 				
 		}
 
-		Mat colorImage(src.rows, src.cols, CV_8UC3);
+		Mat colorImage(src.rows, src.cols, CV_8UC3, Scalar(255,255,255));
 		
 		Vec3b colors[numberOfClusters];
 		for (int i = 0; i < numberOfClusters; i++)
@@ -5514,6 +5514,30 @@ void thesis()
 			constellationTriangles.at<Vec3b>(constellationTriangle.points[2].y, constellationTriangle.points[2].x) = Vec3b(0, 0, 255);
 
 			imshow("Similar Triangles Constellation", constellationTriangles);
+			
+			Point2f srcTri[3];
+			srcTri[0] = Point2f(inputTriangle.points[0].x, inputTriangle.points[0].y);
+			srcTri[1] = Point2f(inputTriangle.points[1].x, inputTriangle.points[1].y);
+			srcTri[2] = Point2f(inputTriangle.points[2].x, inputTriangle.points[2].y);
+			Point2f dstTri[3];
+			dstTri[0] = Point2f(constellationTriangle.points[0].x, constellationTriangle.points[0].y);
+			dstTri[1] = Point2f(constellationTriangle.points[1].x, constellationTriangle.points[1].y);
+			dstTri[2] = Point2f(constellationTriangle.points[2].x, constellationTriangle.points[2].y);
+			
+			Mat warp_mat = getAffineTransform(srcTri, dstTri);
+			
+			Mat warp_dst = Mat::zeros(similarTriangles.rows, similarTriangles.cols, similarTriangles.type());
+			
+			Mat inputTrianglePointsImage = Mat::zeros(src.rows, src.cols, CV_8UC1);
+			inputTrianglePointsImage.at<uchar>(inputTriangle.points[0].y, inputTriangle.points[0].x) = WHITE;
+			inputTrianglePointsImage.at<uchar>(inputTriangle.points[1].y, inputTriangle.points[1].x) = WHITE;
+			inputTrianglePointsImage.at<uchar>(inputTriangle.points[2].y, inputTriangle.points[2].x) = WHITE;
+
+			imshow("Input triangle only", inputTrianglePointsImage);
+
+			warpAffine(inputTrianglePointsImage, warp_dst, warp_mat, warp_dst.size());
+			
+			imshow("Warp Input triangle src=constellation dst=input image", warp_dst);
 		}
 
 		printf("Constellation points = %d\nConstellation triangles= %d\n", constellationPoints.size(), constellationTriangles.size());
