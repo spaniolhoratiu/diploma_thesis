@@ -5520,14 +5520,14 @@ void thesis()
 			double smallestSum = INT_MAX;
 
 			std::vector<MatchingTrianglePairs> allPairs;
-			//int LIMIT_NB_TRIANGLES = 10;
+			int LIMIT_NB_TRIANGLES = 10;
 			//Triangle inputTriangle, constellationTriangle;
 			for (int i = 0; i < inputTriangles.size(); i++)
 			{
 				for (int j = 0; j < constellationTriangles.size(); j++)
 				{
 					MatchingTrianglePairs currentPair(inputTriangles[i], constellationTriangles[j]);
-					//if (allPairs.size() >= LIMIT_NB_TRIANGLES) break;
+					if (allPairs.size() >= LIMIT_NB_TRIANGLES) break;
 					if (currentPair.difference < TRIANGLES_DIFFERENCE_THRESHOLD)
 					{
 						allPairs.push_back(currentPair);
@@ -5541,6 +5541,7 @@ void thesis()
 
 			for (int i = 0; i < allPairs.size(); i++)
 			{
+
 				MatchingTrianglePairs currentPair = allPairs[i];
 
 				Mat constellationPointsOnlyImage = Mat::zeros(500, 770, CV_32FC1);
@@ -5566,66 +5567,86 @@ void thesis()
 
 				Mat warp_mat = getAffineTransform(srcTri, dstTri);
 				
+				std::vector<Point2f> warpedConstellationPoints;
+				for (int j = 0; j < constellationPoints.size(); j++)
+				{
+					Point2f aux(constellationPoints[j].x, constellationPoints[j].y);
+					Point2f warpedPoint;
+					warpedPoint.x = warp_mat.at<double>(0, 0) * aux.x + warp_mat.at<double>(0, 1) * aux.y + warp_mat.at<double>(0, 2);
+					warpedPoint.y =	warp_mat.at<double>(1, 0) * aux.x + warp_mat.at<double>(1, 1) * aux.y + warp_mat.at<double>(1, 2);
+					warpedConstellationPoints.push_back(warpedPoint);
+				}
+				 
+				// Float -> int : add 0.5 then (int)
+
+
 				Mat warp_dst = Mat::zeros(500, 770, CV_32FC1);
 
 				warpAffine(constellationPointsOnlyImage, warp_dst, warp_mat, warp_dst.size());
 				
-				warp_dst = filterWarpedImageFloat(warp_dst);
+				//warp_dst = filterWarpedImageFloat(warp_dst);
 
-				//printf("Warp mat:");
+				//printf("Warp mat %d:", i);
 				//for (int j = 0; j < warp_mat.rows; j++)
 				//{
 				//	printf("\n");
 				//	for (int k = 0; k < warp_mat.cols; k++)
 				//	{
-				//		printf("%lf ", warp_mat.at<float>(j, k));
+				//		printf("%lf ", warp_mat.at<double>(j, k));
 				//	}
 				//}
 				//printf("\n\n");
 
 
-				//Mat inputHighlightedImage = imread(fname, IMREAD_COLOR);
-				//Mat constellationHighlightedImage = imread("D:/Facultate/AN IV/Licenta/data/constellations/png/constellation11.png", IMREAD_COLOR);
+				Mat inputHighlightedImage = imread(fname, IMREAD_COLOR);
+				Mat constellationHighlightedImage = imread("D:/Facultate/AN IV/Licenta/data/constellations/png/constellation11.png", IMREAD_COLOR);
 
-				//line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[1], Vec3b(255, 0, 0), 1);
-				//line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[2], Vec3b(0, 255, 0), 1);
-				//line(inputHighlightedImage, currentPair.inputTriangle.points[1], currentPair.inputTriangle.points[2], Vec3b(0, 0, 255), 1);
+				line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[1], Vec3b(255, 0, 0), 1);
+				line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[2], Vec3b(0, 255, 0), 1);
+				line(inputHighlightedImage, currentPair.inputTriangle.points[1], currentPair.inputTriangle.points[2], Vec3b(0, 0, 255), 1);
 
 				//line(constellationHighlightedImage, currentPair.constellationTriangle.points[0], currentPair.constellationTriangle.points[1], Vec3b(255, 0, 0), 1);
 				//line(constellationHighlightedImage, currentPair.constellationTriangle.points[0], currentPair.constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
 				//line(constellationHighlightedImage, currentPair.constellationTriangle.points[1], currentPair.constellationTriangle.points[2], Vec3b(0, 0, 255), 1);
 
-				//char buffer4[50];
-				//sprintf(buffer4, "inputHighlightedImage %d", i);
-				//imshow(buffer4, inputHighlightedImage);
-				//char buffer5[50];
-				//sprintf(buffer5, "constellationHighlightedImage %d", i);
-				//imshow(buffer5, constellationHighlightedImage);
-				//char buffer6[50];
-				//sprintf(buffer6, "constellationWarpedHighlightedImage %d", i);
-				//imshow(buffer6, warp_dst);
+				//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[0],2, Vec3b(255, 0, 0), 3);
+				//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[1], 2, Vec3b(255, 0, 0), 3);
+				//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[2], 2, Vec3b(255, 0, 0), 3);
+	
+				char buffer4[50];
+				sprintf(buffer4, "inputHighlightedImage %d", i);
+				imshow(buffer4, inputHighlightedImage);
+				char buffer5[50];
+				sprintf(buffer5, "constellationHighlightedImage %d", i);
+				imshow(buffer5, constellationHighlightedImage);
+				char buffer6[50];
+				sprintf(buffer6, "constellationWarpedHighlightedImage %d", i);
+				imshow(buffer6, warp_dst);
+				char buffer7[50];
+				sprintf(buffer7, "constellationPointsOnlyImage %d", i);
+				imshow(buffer7, constellationPointsOnlyImage);
+				
 				
 
+				//
 
-				
+				//int matchingStarsNb = 0;
+				//for (int j = 0; j < warp_dst.rows; j++)
+				//{
+				//	for (int k = 0; k < warp_dst.cols; k++)
+				//	{
+				//		if (warp_dst.at<float>(j, k) == WHITE && centerOfMassInformation.image.at<uchar>(j, k) == WHITE)
+				//		{
+				//			matchingStarsNb++;
+				//		}
+				//	}
+				//}
 
-				int matchingStarsNb = 0;
-				for (int j = 0; j < warp_dst.rows; j++)
-				{
-					for (int k = 0; k < warp_dst.cols; k++)
-					{
-						if (warp_dst.at<float>(j, k) == WHITE && centerOfMassInformation.image.at<uchar>(j, k) == WHITE)
-						{
-							matchingStarsNb++;
-						}
-					}
-				}
-
-				if (matchingStarsNb > 3)
-				{
-					printf("%i Matching stars = %d\n", i, matchingStarsNb);
-				}
-				
+				//if (matchingStarsNb > 3)
+				//{
+				//	printf("%i Matching stars = %d\n", i, matchingStarsNb);
+				//}
+				//
 
 
 				//int pointsInWarpedImage = 0;
