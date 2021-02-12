@@ -5413,6 +5413,7 @@ void thesis()
 	Mat src;
 	const int BINARIZATION_THRESHOLD = 25;
 	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.01;
+	const int NUMBER_OF_CONSTELLATIONS = 89;
 	//int di[8] = { -1, 0, 1, 0, -1, 1, -1, 1 };
 	//int dj[8] = { 0, -1, 0, 1, 1, -1, -1, 1 };
 	//uchar neighbors[8];
@@ -5456,233 +5457,274 @@ void thesis()
 		}
 
 
-		std::vector<Point> constellationPoints;
-		std::vector<Triangle> constellationTriangles;
-				
 
-		FILE* fp;
-		fp = fopen("D:\\Facultate\\AN IV\\Licenta\\data\\preprocessing_info\\constellationInfo.txt", "r");
-		if (fp == NULL)
+
+		for (int currentConstellationNumber = 0; currentConstellationNumber < NUMBER_OF_CONSTELLATIONS; currentConstellationNumber++)
 		{
-			printf("Error opening file.");
-		}
-		else
-		{
-
-			// Read constellation file
-
-			int nbOfPoints, nbOfTriangles;
-			fscanf(fp, "%d %d", &nbOfPoints, &nbOfTriangles);
-
-			for (int i = 0; i < nbOfPoints; i++)
+			
+			char fileName[250];
+			if (currentConstellationNumber < 10)
+				sprintf(fileName, "D://Facultate//AN IV//Licenta//data//preprocessing_info//constellation0%d_data.txt", currentConstellationNumber);
+			else
+				sprintf(fileName, "D://Facultate//AN IV//Licenta//data//preprocessing_info//constellation%d_data.txt", currentConstellationNumber);
+			
+			FILE* fp;
+			fp = fopen(fileName, "r");
+			if (fp != NULL)
 			{
-				int x, y;
-				fscanf(fp, "%d %d", &x, &y);
-				constellationPoints.push_back(Point(x,y));
-			}
+				std::vector<Point> constellationPoints;
+				std::vector<Triangle> constellationTriangles;
+				std::vector<std::vector<int>> constellationLines;
 
-			for (int i = 0; i < nbOfTriangles; i++)
-			{
-				Triangle currentTriangle;
-				int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
-				double d1, d2, d3;	
-				fscanf(fp, "%d %d %d %d %lf %d %d %d %d %lf %d %d %d %d %lf",
-					&x1, &y1, &x2, &y2, &d1,
-					&x3, &y3, &x4, &y4, &d2,
-					&x5, &y5, &x6, &y6, &d3);
+				// Read constellation file
+				int nbOfPoints, nbOfLines, nbOfTriangles;
+				fscanf(fp, "%d %d %d", &nbOfPoints, &nbOfLines, &nbOfTriangles);
 
-				// TODO: adding these points MIGHT be redundant 
-				currentTriangle.points.push_back(Point(x1, y1));
-				currentTriangle.points.push_back(Point(x3, y3));
-				currentTriangle.points.push_back(Point(x5, y5));
+				printf("Constellation %d\nPoints: %d\nLines: %d\nTriangles: %d\n",
+					currentConstellationNumber,
+					nbOfPoints,
+					nbOfLines,
+					nbOfTriangles);
 
-				Distance distance1(Point(x1, y1), Point(x2, y2), d1);
-				Distance distance2(Point(x3, y3), Point(x4, y4), d2);
-				Distance distance3(Point(x5, y5), Point(x6, y6), d3);
-				
-				currentTriangle.distances.push_back(distance1);
-				currentTriangle.distances.push_back(distance2);
-				currentTriangle.distances.push_back(distance3);
-
-				constellationTriangles.push_back(currentTriangle);
-			}
-
-			fclose(fp);
-		
-			printf("Started triangle computations...\n");
-			std::vector<MatchingTrianglePairs> allPairs;
-			//int LIMIT_NB_TRIANGLES = 10;
-			for (int i = 0; i < inputTriangles.size(); i++)
-			{
-				for (int j = 0; j < constellationTriangles.size(); j++)
+				for (int i = 0; i < nbOfPoints; i++)
 				{
-					MatchingTrianglePairs currentPair(inputTriangles[i], constellationTriangles[j]);
-					//if (allPairs.size() >= LIMIT_NB_TRIANGLES) break;
-					if (currentPair.difference < TRIANGLES_DIFFERENCE_THRESHOLD)
+					int index, x, y;
+					fscanf(fp, "%d %d %d", &index, &x, &y); // index not used while reading, I use push_back so it's in order already
+					constellationPoints.push_back(Point(x,y));
+				}
+
+				for (int i = 0; i < nbOfLines; i++)
+				{
+					int p1Index, p2Index;
+					fscanf(fp, "%d %d", &p1Index, &p2Index);
+					std::vector<int> aux;
+					aux.push_back(p1Index);
+					aux.push_back(p2Index);
+					constellationLines.push_back(aux);
+				}
+
+				for (int i = 0; i < nbOfTriangles; i++)
+				{
+					Triangle currentTriangle;
+					int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
+					double d1, d2, d3;	
+					fscanf(fp, "%d %d %d %d %lf %d %d %d %d %lf %d %d %d %d %lf",
+						&x1, &y1, &x2, &y2, &d1,
+						&x3, &y3, &x4, &y4, &d2,
+						&x5, &y5, &x6, &y6, &d3);
+
+					// TODO: adding these points MIGHT be redundant 
+					currentTriangle.points.push_back(Point(x1, y1));
+					currentTriangle.points.push_back(Point(x3, y3));
+					currentTriangle.points.push_back(Point(x5, y5));
+
+					Distance distance1(Point(x1, y1), Point(x2, y2), d1);
+					Distance distance2(Point(x3, y3), Point(x4, y4), d2);
+					Distance distance3(Point(x5, y5), Point(x6, y6), d3);
+				
+					currentTriangle.distances.push_back(distance1);
+					currentTriangle.distances.push_back(distance2);
+					currentTriangle.distances.push_back(distance3);
+
+					constellationTriangles.push_back(currentTriangle);
+				}
+
+				fclose(fp);
+		
+				// Brute force comparison between source and constellation triangles
+				printf("Started triangle computations...\n");
+				std::vector<MatchingTrianglePairs> allPairs;
+				//int LIMIT_NB_TRIANGLES = 10;
+				for (int i = 0; i < inputTriangles.size(); i++)
+				{
+					for (int j = 0; j < constellationTriangles.size(); j++)
 					{
-						allPairs.push_back(currentPair);
+						MatchingTrianglePairs currentPair(inputTriangles[i], constellationTriangles[j]);
+						//if (allPairs.size() >= LIMIT_NB_TRIANGLES) break;
+						if (currentPair.difference < TRIANGLES_DIFFERENCE_THRESHOLD)
+						{
+							allPairs.push_back(currentPair);
+						}
 					}
 				}
-			}
-			printf("Number of matching triangle pairs under %lf = %d\n", TRIANGLES_DIFFERENCE_THRESHOLD, allPairs.size());
+				printf("Number of matching triangle pairs under %lf = %d\n", TRIANGLES_DIFFERENCE_THRESHOLD, allPairs.size());
 			
-			sort(allPairs.begin(), allPairs.end());
-			//int successfulWarps = 0;
+				sort(allPairs.begin(), allPairs.end()); // Trivial; all pairs are tested anyways.
 
-			for (int i = 0; i < allPairs.size(); i++)
-			{
-				MatchingTrianglePairs currentPair = allPairs[i];
-
-				Point2f srcTri[3];
-				srcTri[0] = Point2f(currentPair.constellationTriangle.points[0].x, currentPair.constellationTriangle.points[0].y);
-				srcTri[1] = Point2f(currentPair.constellationTriangle.points[1].x, currentPair.constellationTriangle.points[1].y);
-				srcTri[2] = Point2f(currentPair.constellationTriangle.points[2].x, currentPair.constellationTriangle.points[2].y);
-				Point2f dstTri[3];
-				dstTri[0] = Point2f(currentPair.inputTriangle.points[0].x, currentPair.inputTriangle.points[0].y);
-				dstTri[1] = Point2f(currentPair.inputTriangle.points[1].x, currentPair.inputTriangle.points[1].y);
-				dstTri[2] = Point2f(currentPair.inputTriangle.points[2].x, currentPair.inputTriangle.points[2].y);
-
-				Mat warp_mat = getAffineTransform(srcTri, dstTri);
-				
-				std::vector<Point2f> warpedConstellationPoints;
-				for (int j = 0; j < constellationPoints.size(); j++)
+				for (int i = 0; i < allPairs.size(); i++)
 				{
-					Point2f nonWarpedPoint(constellationPoints[j].x, constellationPoints[j].y);
-					Point2f warpedPoint;
-					warpedPoint.x = warp_mat.at<double>(0, 0) * nonWarpedPoint.x + warp_mat.at<double>(0, 1) * nonWarpedPoint.y + warp_mat.at<double>(0, 2);
-					warpedPoint.y =	warp_mat.at<double>(1, 0) * nonWarpedPoint.x + warp_mat.at<double>(1, 1) * nonWarpedPoint.y + warp_mat.at<double>(1, 2);
-					warpedConstellationPoints.push_back(warpedPoint);
-				}
-				
-				// Float -> int : add 0.5 then (int)
-				std::vector<int> matchedIndexes;
-				int matchingStarsNb = 0;
-				for (int j = 0; j < warpedConstellationPoints.size(); j++)
-				{
-					Point2f currentPoint = warpedConstellationPoints[j];
-					int yOfPoint = (int)(currentPoint.y + 0.5f);
-					int xOfPoint = (int)(currentPoint.x + 0.5f);
-					if (yOfPoint > centerOfMassInformation.image.rows || yOfPoint < 0) break;
-					if (xOfPoint > centerOfMassInformation.image.cols || xOfPoint < 0) break;
+					MatchingTrianglePairs currentPair = allPairs[i];
 
-					bool brokeInnerLoop = false;
-					int lowBound = -2;
-					int highBound = 2;
-					for (int index1 = lowBound; index1 <= highBound; index1++)
+					Point2f srcTri[3];
+					srcTri[0] = Point2f(currentPair.constellationTriangle.points[0].x, currentPair.constellationTriangle.points[0].y);
+					srcTri[1] = Point2f(currentPair.constellationTriangle.points[1].x, currentPair.constellationTriangle.points[1].y);
+					srcTri[2] = Point2f(currentPair.constellationTriangle.points[2].x, currentPair.constellationTriangle.points[2].y);
+					Point2f dstTri[3];
+					dstTri[0] = Point2f(currentPair.inputTriangle.points[0].x, currentPair.inputTriangle.points[0].y);
+					dstTri[1] = Point2f(currentPair.inputTriangle.points[1].x, currentPair.inputTriangle.points[1].y);
+					dstTri[2] = Point2f(currentPair.inputTriangle.points[2].x, currentPair.inputTriangle.points[2].y);
+
+					Mat warp_mat = getAffineTransform(srcTri, dstTri);
+				
+					// Warp constellation
+					std::vector<Point2f> warpedConstellationPoints;
+					for (int j = 0; j < constellationPoints.size(); j++)
 					{
-						for (int index2 = lowBound; index2 <= highBound; index2++)
-						{
-							if (centerOfMassInformation.image.at<uchar>(yOfPoint + index1, xOfPoint + index2) == WHITE)
-							{
-								matchingStarsNb++;
-								matchedIndexes.push_back(j);
-								brokeInnerLoop = true;
-								break;
+						Point2f nonWarpedPoint(constellationPoints[j].x, constellationPoints[j].y);
+						Point2f warpedPoint;
+						warpedPoint.x = warp_mat.at<double>(0, 0) * nonWarpedPoint.x + warp_mat.at<double>(0, 1) * nonWarpedPoint.y + warp_mat.at<double>(0, 2);
+						warpedPoint.y =	warp_mat.at<double>(1, 0) * nonWarpedPoint.x + warp_mat.at<double>(1, 1) * nonWarpedPoint.y + warp_mat.at<double>(1, 2);
+						warpedConstellationPoints.push_back(warpedPoint);
+					}
+				
+					// Float -> int : add 0.5 then (int)
+					std::vector<int> matchedIndexes;
+					int matchingStarsNb = 0;
+					// Compunte number of matching stars between warped constellation and source image
+					for (int j = 0; j < warpedConstellationPoints.size(); j++)
+					{
+						Point2f currentPoint = warpedConstellationPoints[j];
+						int yOfPoint = (int)(currentPoint.y + 0.5f);
+						int xOfPoint = (int)(currentPoint.x + 0.5f);
+						if (yOfPoint > centerOfMassInformation.image.rows || yOfPoint < 0) break;
+						if (xOfPoint > centerOfMassInformation.image.cols || xOfPoint < 0) break;
 
+						bool brokeInnerLoop = false;
+						int lowBound = -2;
+						int highBound = 2;
+						for (int index1 = lowBound; index1 <= highBound; index1++)
+						{
+							for (int index2 = lowBound; index2 <= highBound; index2++)
+							{
+								if (centerOfMassInformation.image.at<uchar>(yOfPoint + index1, xOfPoint + index2) == WHITE)
+								{
+									matchingStarsNb++;
+									matchedIndexes.push_back(j);
+									brokeInnerLoop = true;
+									break;
+								}
+
+								if (brokeInnerLoop) break;
 							}
 
-							if (brokeInnerLoop) break;
+						}
+					
+					}
+
+					//if (matchingStarsNb > (int)(constellationPoints.size() * 0.7f + 0.5))
+					if (matchingStarsNb == constellationPoints.size())
+					{
+						printf("%i Matching stars = %d, Difference = %lf\n", i, matchingStarsNb, currentPair.difference);
+
+						Mat inputHighlightedImage = imread(fname, IMREAD_COLOR);
+						char constellationImageFileName[250];
+						if(currentConstellationNumber < 10)
+							sprintf(constellationImageFileName, "D:/Facultate/AN IV/Licenta/data/constellations/png/constellation0%d.png", currentConstellationNumber);
+						else
+							sprintf(constellationImageFileName, "D:/Facultate/AN IV/Licenta/data/constellations/png/constellation%d.png", currentConstellationNumber);
+						Mat constellationHighlightedImage = imread(constellationImageFileName, IMREAD_COLOR);
+
+						// Drawing matching triangles
+						line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[1], Vec3b(255, 0, 0), 1);
+						line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[2], Vec3b(0, 255, 0), 1);
+						line(inputHighlightedImage, currentPair.inputTriangle.points[1], currentPair.inputTriangle.points[2], Vec3b(0, 0, 255), 1);
+
+						line(constellationHighlightedImage, currentPair.constellationTriangle.points[0], currentPair.constellationTriangle.points[1], Vec3b(255, 0, 0), 1);
+						line(constellationHighlightedImage, currentPair.constellationTriangle.points[0], currentPair.constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
+						line(constellationHighlightedImage, currentPair.constellationTriangle.points[1], currentPair.constellationTriangle.points[2], Vec3b(0, 0, 255), 1);
+
+						// Drawing points of warped constellation on input image
+						for (int j = 0; j < matchedIndexes.size(); j++)
+						{
+							circle(inputHighlightedImage, warpedConstellationPoints[matchedIndexes[j]], 2, Vec3b(0, 0, 255), 3);
 						}
 
+						// Drawing lines of warped constellation on input image
+						for (int j = 0; j < constellationLines.size(); j++)
+						{
+							std::vector<int> currentLine = constellationLines[j];
+							if (std::find(matchedIndexes.begin(), matchedIndexes.begin(), currentLine[0]) != matchedIndexes.end() // If this line has both stars found
+								&& std::find(matchedIndexes.begin(), matchedIndexes.begin(), currentLine[1]) != matchedIndexes.end())
+							{
+								line(inputHighlightedImage,
+									warpedConstellationPoints[currentLine[0]], warpedConstellationPoints[currentLine[1]], Vec3b(255, 255, 0), 1);
+							}
+
+						}
+
+						char buffer4[50];
+						sprintf(buffer4, "inputHighlighted %d constellation %d", i, currentConstellationNumber);
+						imshow(buffer4, inputHighlightedImage);
+						char buffer5[50];
+						sprintf(buffer5, "constellationHighlighted %d constellation %d", i, currentConstellationNumber);
+						imshow(buffer5, constellationHighlightedImage);
 					}
-					
-				}
-
-				//if (matchingStarsNb > (int)(constellationPoints.size() * 0.7f + 0.5))
-				if (matchingStarsNb > 5)
-				{
-					printf("%i Matching stars = %d, Difference = %lf\n", i, matchingStarsNb, currentPair.difference);
-
-					Mat inputHighlightedImage = imread(fname, IMREAD_COLOR);
-					Mat constellationHighlightedImage = imread("D:/Facultate/AN IV/Licenta/data/constellations/png/constellation11.png", IMREAD_COLOR);
-
-					line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[1], Vec3b(255, 0, 0), 1);
-					line(inputHighlightedImage, currentPair.inputTriangle.points[0], currentPair.inputTriangle.points[2], Vec3b(0, 255, 0), 1);
-					line(inputHighlightedImage, currentPair.inputTriangle.points[1], currentPair.inputTriangle.points[2], Vec3b(0, 0, 255), 1);
-
-					line(constellationHighlightedImage, currentPair.constellationTriangle.points[0], currentPair.constellationTriangle.points[1], Vec3b(255, 0, 0), 1);
-					line(constellationHighlightedImage, currentPair.constellationTriangle.points[0], currentPair.constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
-					line(constellationHighlightedImage, currentPair.constellationTriangle.points[1], currentPair.constellationTriangle.points[2], Vec3b(0, 0, 255), 1);
-
-					for (int j = 0; j < matchedIndexes.size(); j++)
-					{
-						circle(inputHighlightedImage, warpedConstellationPoints[matchedIndexes[j]], 2, Vec3b(0, 0, 255), 3);
-					}
-
-					char buffer4[50];
-					sprintf(buffer4, "inputHighlightedImage %d", i);
-					imshow(buffer4, inputHighlightedImage);
-					char buffer5[50];
-					sprintf(buffer5, "constellationHighlightedImage %d", i);
-					imshow(buffer5, constellationHighlightedImage);
-				}
 
 
 				
-				//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[0],2, Vec3b(255, 0, 0), 3);
-				//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[1], 2, Vec3b(255, 0, 0), 3);
-				//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[2], 2, Vec3b(255, 0, 0), 3);
+					//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[0],2, Vec3b(255, 0, 0), 3);
+					//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[1], 2, Vec3b(255, 0, 0), 3);
+					//circle(constellationHighlightedImage, currentPair.constellationTriangle.points[2], 2, Vec3b(255, 0, 0), 3);
 	
-				//char buffer4[50];
-				//sprintf(buffer4, "inputHighlightedImage %d", i);
-				//imshow(buffer4, inputHighlightedImage);
-				//char buffer5[50];
-				//sprintf(buffer5, "constellationHighlightedImage %d", i);
-				//imshow(buffer5, constellationHighlightedImage);
-				//char buffer6[50];
-				//sprintf(buffer6, "constellationWarpedHighlightedImage %d", i);
-				//imshow(buffer6, warp_dst);
-				//char buffer7[50];
-				//sprintf(buffer7, "constellationPointsOnlyImage %d", i);
-				//imshow(buffer7, constellationPointsOnlyImage);
+					//char buffer4[50];
+					//sprintf(buffer4, "inputHighlightedImage %d", i);
+					//imshow(buffer4, inputHighlightedImage);
+					//char buffer5[50];
+					//sprintf(buffer5, "constellationHighlightedImage %d", i);
+					//imshow(buffer5, constellationHighlightedImage);
+					//char buffer6[50];
+					//sprintf(buffer6, "constellationWarpedHighlightedImage %d", i);
+					//imshow(buffer6, warp_dst);
+					//char buffer7[50];
+					//sprintf(buffer7, "constellationPointsOnlyImage %d", i);
+					//imshow(buffer7, constellationPointsOnlyImage);
 				
 				
 
-				//
+					//
 
-				//int matchingStarsNb = 0;
-				//for (int j = 0; j < warp_dst.rows; j++)
-				//{
-				//	for (int k = 0; k < warp_dst.cols; k++)
-				//	{
-				//		if (warp_dst.at<float>(j, k) == WHITE && centerOfMassInformation.image.at<uchar>(j, k) == WHITE)
-				//		{
-				//			matchingStarsNb++;
-				//		}
-				//	}
-				//}
-
-
-
-				//int pointsInWarpedImage = 0;
-				//for (int j = 0; j < warp_dst.rows; j++)
-				//	for (int k = 0; k < warp_dst.cols; k++)
-				//		if (warp_dst.at<float>(j, k) == WHITE) pointsInWarpedImage++;
-				//if (pointsInWarpedImage != matchingStarsNb)
-				//	printf("Warp %d not matching on all stars. Warped nb = %d, Matching nb = %d \n", i, pointsInWarpedImage, matchingStarsNb);
+					//int matchingStarsNb = 0;
+					//for (int j = 0; j < warp_dst.rows; j++)
+					//{
+					//	for (int k = 0; k < warp_dst.cols; k++)
+					//	{
+					//		if (warp_dst.at<float>(j, k) == WHITE && centerOfMassInformation.image.at<uchar>(j, k) == WHITE)
+					//		{
+					//			matchingStarsNb++;
+					//		}
+					//	}
+					//}
 
 
-				//char buffer2[50];
-				//sprintf(buffer2, "Warp %d", i);
-				//imshow(buffer2, warp_dst);
 
-				//char buffer3[50];
-				//sprintf(buffer3, "Before warp %d", i);
-				//imshow(buffer3, constellationTrianglePointsOnlyImage);
-				//printf("Warp %d\n", i);
-				//if (pointsInWarpedImage == pointsInNonWarpedImage)
-				//{
-				//	successfulWarps++;
-				//}
-				//printf("Points in warp %d = %d\n", i, pointsInWarpedImage);
-				//printf("Points in non-warp %d = %d\n\n", i, pointsInNonWarpedImage);
-			}
+					//int pointsInWarpedImage = 0;
+					//for (int j = 0; j < warp_dst.rows; j++)
+					//	for (int k = 0; k < warp_dst.cols; k++)
+					//		if (warp_dst.at<float>(j, k) == WHITE) pointsInWarpedImage++;
+					//if (pointsInWarpedImage != matchingStarsNb)
+					//	printf("Warp %d not matching on all stars. Warped nb = %d, Matching nb = %d \n", i, pointsInWarpedImage, matchingStarsNb);
+
+
+					//char buffer2[50];
+					//sprintf(buffer2, "Warp %d", i);
+					//imshow(buffer2, warp_dst);
+
+					//char buffer3[50];
+					//sprintf(buffer3, "Before warp %d", i);
+					//imshow(buffer3, constellationTrianglePointsOnlyImage);
+					//printf("Warp %d\n", i);
+					//if (pointsInWarpedImage == pointsInNonWarpedImage)
+					//{
+					//	successfulWarps++;
+					//}
+					//printf("Points in warp %d = %d\n", i, pointsInWarpedImage);
+					//printf("Points in non-warp %d = %d\n\n", i, pointsInNonWarpedImage);
+				}
 
 			
-		}
-
-		printf("Constellation points = %d\nConstellation triangles= %d\n", constellationPoints.size(), constellationTriangles.size());
+			}
 		
+		}
 	}
 
 }
@@ -5808,10 +5850,12 @@ Mat filterForStars(Mat src)
 	return filtered;
 }
 
-void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangle> triangles)
+void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangle> triangles, int firstNb, int secondNb)
 {
 	FILE* fp;
-	fp = fopen("D:\\Facultate\\AN IV\\Licenta\\data\\preprocessing_info\\constellationInfo.txt", "w+");
+	char fileName[250];
+	sprintf(fileName, "D:\\Facultate\\AN IV\\Licenta\\data\\preprocessing_info\\constellation%d%d_data.txt", firstNb, secondNb);
+	fp = fopen(fileName, "w+");
 	if (fp == NULL)
 	{
 		printf("Error opening file.\n");
@@ -5825,7 +5869,7 @@ void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangl
 		
 		for (int i = 0; i < points.size(); i++)
 		{
-			fprintf(fp, "\n%d %d ", points[i].x, points[i].y);
+			fprintf(fp, "\n%d %d %d ", i, points[i].x, points[i].y);
 		}
 
 		for (int i = 0; i < triangles.size(); i++)
@@ -5951,6 +5995,7 @@ void testConstellationPreprocessingOnSelectedImage()
 		printf("Number of stars: %d\n", colorsOfObjects.size());
 
 		CenterOfMassInformation centerOfMassInformation = computeCentersOfMass(labeledImage, colorsOfObjects);
+		Mat centerOfMassImage = centerOfMassInformation.image;
 		imshow("Centers of mass", centerOfMassInformation.image);
 
 		/*
@@ -5976,7 +6021,10 @@ void testConstellationPreprocessingOnSelectedImage()
 			triangles.push_back(triangle);
 		}
 		
-		writeConstellationInfoInFile(centerOfMassInformation.points, triangles);
+		int firstNb = fname[64] - '0'; // Get "01" from D://...//constellation01.png
+		int secondNb = fname[65] - '0';
+
+		writeConstellationInfoInFile(centerOfMassInformation.points, triangles, firstNb, secondNb);
 			
 	}
 }
