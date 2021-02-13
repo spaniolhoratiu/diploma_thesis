@@ -5456,7 +5456,9 @@ void thesis()
 			inputTriangles.push_back(triangle);
 		}
 
-
+		printf("\nInput image\n");
+		printf("Points:%d\n", inputPoints.size());
+		printf("Triangles:%d\n", inputTriangles.size());
 
 
 		for (int currentConstellationNumber = 0; currentConstellationNumber < NUMBER_OF_CONSTELLATIONS; currentConstellationNumber++)
@@ -5464,9 +5466,13 @@ void thesis()
 			
 			char fileName[250];
 			if (currentConstellationNumber < 10)
-				sprintf(fileName, "D://Facultate//AN IV//Licenta//data//preprocessing_info//constellation0%d_data.txt", currentConstellationNumber);
+			{
+				
+				sprintf(fileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//constellation0%d_data.txt", currentConstellationNumber);
+
+			}
 			else
-				sprintf(fileName, "D://Facultate//AN IV//Licenta//data//preprocessing_info//constellation%d_data.txt", currentConstellationNumber);
+				sprintf(fileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//constellation%d_data.txt", currentConstellationNumber);
 			
 			FILE* fp;
 			fp = fopen(fileName, "r");
@@ -5480,7 +5486,7 @@ void thesis()
 				int nbOfPoints, nbOfLines, nbOfTriangles;
 				fscanf(fp, "%d %d %d", &nbOfPoints, &nbOfLines, &nbOfTriangles);
 
-				printf("Constellation %d\nPoints: %d\nLines: %d\nTriangles: %d\n",
+				printf("\nConstellation %d\nPoints: %d\nLines: %d\nTriangles: %d\n",
 					currentConstellationNumber,
 					nbOfPoints,
 					nbOfLines,
@@ -5580,7 +5586,7 @@ void thesis()
 					// Float -> int : add 0.5 then (int)
 					std::vector<int> matchedIndexes;
 					int matchingStarsNb = 0;
-					// Compunte number of matching stars between warped constellation and source image
+					// Compute number of matching stars between warped constellation and source image
 					for (int j = 0; j < warpedConstellationPoints.size(); j++)
 					{
 						Point2f currentPoint = warpedConstellationPoints[j];
@@ -5614,14 +5620,14 @@ void thesis()
 					//if (matchingStarsNb > (int)(constellationPoints.size() * 0.7f + 0.5))
 					if (matchingStarsNb == constellationPoints.size())
 					{
-						printf("%i Matching stars = %d, Difference = %lf\n", i, matchingStarsNb, currentPair.difference);
+						printf("Pair %i Matching stars = %d, Difference = %lf\n", i, matchingStarsNb, currentPair.difference);
 
 						Mat inputHighlightedImage = imread(fname, IMREAD_COLOR);
 						char constellationImageFileName[250];
 						if(currentConstellationNumber < 10)
-							sprintf(constellationImageFileName, "D:/Facultate/AN IV/Licenta/data/constellations/png/constellation0%d.png", currentConstellationNumber);
+							sprintf(constellationImageFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations//png//constellation0%d.png", currentConstellationNumber);
 						else
-							sprintf(constellationImageFileName, "D:/Facultate/AN IV/Licenta/data/constellations/png/constellation%d.png", currentConstellationNumber);
+							sprintf(constellationImageFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations//png//constellation%d.png", currentConstellationNumber);
 						Mat constellationHighlightedImage = imread(constellationImageFileName, IMREAD_COLOR);
 
 						// Drawing matching triangles
@@ -5854,7 +5860,7 @@ void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangl
 {
 	FILE* fp;
 	char fileName[250];
-	sprintf(fileName, "D:\\Facultate\\AN IV\\Licenta\\data\\preprocessing_info\\constellation%d%d_data.txt", firstNb, secondNb);
+	sprintf(fileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//constellation%d%d_data.txt", firstNb, secondNb);
 	fp = fopen(fileName, "w+");
 	if (fp == NULL)
 	{
@@ -5982,8 +5988,10 @@ void testConstellationPreprocessingOnSelectedImage()
 		Mat starsOnly = filterForStars(src);
 		imshow("Stars only", starsOnly);
 
-		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 1, WHITE, BLACK);
-		//erosionDilation = dilateNTimesWithParams(erosionDilation, 1, WHITE, BLACK);
+		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 3, WHITE, BLACK);
+		//erosionDilation = dilateNTimesWithParams(erosionDilation, 3, WHITE, BLACK);
+		//erosionDilation = erodeNTimesWithParams(starsOnly, 3, WHITE, BLACK);
+		//erosionDilation = dilateNTimesWithParams(erosionDilation, 3, WHITE, BLACK);
 		//imshow("Erosion & Dilation", erosionDilation);
 		Mat erosionDilation = starsOnly;
 
@@ -6021,8 +6029,8 @@ void testConstellationPreprocessingOnSelectedImage()
 			triangles.push_back(triangle);
 		}
 		
-		int firstNb = fname[64] - '0'; // Get "01" from D://...//constellation01.png
-		int secondNb = fname[65] - '0';
+		int firstNb = fname[130] - '0'; // Get "01" from D://...//constellation01.png
+		int secondNb = fname[131] - '0';
 
 		writeConstellationInfoInFile(centerOfMassInformation.points, triangles, firstNb, secondNb);
 			
