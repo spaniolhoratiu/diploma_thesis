@@ -5740,13 +5740,12 @@ void thesisEvaluation()
 	const double LUMINOSITY_THRESHOLD = 10.0f;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
-	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.05; // Values to test: 0.01, 0.05
-	const int AREA_THRESHOLD = 1; // Values to test : 3, 2
-	const int POSITION_VARIATION_LOW_BOUND = -5; // Values to test : -2, -3, -5
-	const int POSITION_VARIATION_HIGH_BOUND = 5; // Values to test: 2, 3, 5
+	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.01; // Values to test: 0.01, 0.03, 0.05
+	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
+	const int POSITION_VARIATION = 5; // Values to test: 2, 3, 5
 	
 	// Evaluation
-	const int TARGET_CONSTELLATION = 11;
+	const int TARGET_CONSTELLATION = 6;
 	int NB_IMAGES = 30;
 	int totalMatches = 0;
 	bool falseDetection = false;
@@ -5754,7 +5753,7 @@ void thesisEvaluation()
 	for (int imageIndex = 1; imageIndex <= NB_IMAGES; imageIndex++)
 	{
 		int iterationMatches = 0;
-		sprintf(fname, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//evaluation_images//cancer//%d.png", imageIndex);
+		sprintf(fname, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//evaluation_images//aries//%d.png", imageIndex);
 
 		src = imread(fname, IMREAD_GRAYSCALE);
 		//imshow("Source", src);
@@ -5795,7 +5794,7 @@ void thesisEvaluation()
 		std::vector<std::vector<Point>> srcMatchingPoints; // All sets of matched points found in source image
 		std::vector<int> srcMatchingPointsCounter; // Count the number of times the set is matched
 
-		for (int currentConstellationNumber = 11; currentConstellationNumber < 12; currentConstellationNumber++)
+		for (int currentConstellationNumber = TARGET_CONSTELLATION; currentConstellationNumber < TARGET_CONSTELLATION+1; currentConstellationNumber++)
 		{
 
 			char fileName[250];
@@ -5931,9 +5930,9 @@ void thesisEvaluation()
 						if (xOfPoint > centerOfMassInformation.image.cols || xOfPoint < 0) break;
 
 						bool brokeInnerLoop = false;
-						for (int index1 = POSITION_VARIATION_LOW_BOUND; index1 <= POSITION_VARIATION_HIGH_BOUND; index1++)
+						for (int index1 = (-1 * POSITION_VARIATION); index1 <= POSITION_VARIATION; index1++)
 						{
-							for (int index2 = POSITION_VARIATION_LOW_BOUND; index2 <= POSITION_VARIATION_HIGH_BOUND; index2++)
+							for (int index2 = (-1 * POSITION_VARIATION); index2 <= POSITION_VARIATION; index2++)
 							{
 								if (yOfPoint + index1 > (centerOfMassInformation.image.rows - 1) // Check out of bounds
 									|| yOfPoint + index1 < 0
