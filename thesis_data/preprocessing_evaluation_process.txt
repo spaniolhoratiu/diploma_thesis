@@ -1,0 +1,12 @@
+Idea: variables in terms of constellation nb. of points
+
+Preprocessing + test set:
+00. andromeda - ok. reduced nb. of stars to 6
+01. antilia - not sure where it is in Stellarium. preprocessing ok.
+02. apus - ok. TDT=0.1 to recognize on 1.png
+03.
+04.
+05.
+06. aries - ok
+11. cancer - ok
+47. lepus - ok
