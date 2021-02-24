@@ -5739,18 +5739,15 @@ void thesis_testOnSingularInputImage_withoutLines()
 	const double LUMINOSITY_THRESHOLD = 10.0f;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
-	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.1; // Values to test: 0.01, 0.05
+	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.01; // Values to test: 0.01, 0.05
 	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
-	const int POSITION_VARIATION_LOW_BOUND = -5; // Values to test : -2, -3, -5
-	const int POSITION_VARIATION_HIGH_BOUND = 5; // Values to test: 2, 3, 5
+	const int POSITION_VARIATION = 5; // Values to test : -2, -3, -5
+	const int TARGET_CONSTELLATION = 18;
 
 	while (openFileDlg(fname))
 	{
 		src = imread(fname, IMREAD_GRAYSCALE);
 		imshow("Source grayscale", src);
-
-		Mat srcColor = imread(fname, IMREAD_COLOR);
-		imshow("Source color", srcColor);
 
 		Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
 		char buffer[50];
@@ -5794,7 +5791,7 @@ void thesis_testOnSingularInputImage_withoutLines()
 		std::vector<std::vector<Point>> srcMatchingPoints; // All sets of matched points found in source image
 		std::vector<int> srcMatchingPointsCounter; // Count the number of times the set is matched
 
-		for (int currentConstellationNumber = 0; currentConstellationNumber < NUMBER_OF_CONSTELLATIONS; currentConstellationNumber++)
+		for (int currentConstellationNumber = TARGET_CONSTELLATION; currentConstellationNumber < TARGET_CONSTELLATION+1; currentConstellationNumber++)
 		{
 
 			char fileName[250];
@@ -5915,9 +5912,9 @@ void thesis_testOnSingularInputImage_withoutLines()
 						if (xOfPoint > centerOfMassInformation.image.cols || xOfPoint < 0) break;
 
 						bool brokeInnerLoop = false;
-						for (int index1 = POSITION_VARIATION_LOW_BOUND; index1 <= POSITION_VARIATION_HIGH_BOUND; index1++)
+						for (int index1 = ((-1) * POSITION_VARIATION); index1 <= POSITION_VARIATION; index1++)
 						{
-							for (int index2 = POSITION_VARIATION_LOW_BOUND; index2 <= POSITION_VARIATION_HIGH_BOUND; index2++)
+							for (int index2 = ((-1) * POSITION_VARIATION); index2 <= POSITION_VARIATION; index2++)
 							{
 								if (yOfPoint + index1 > (centerOfMassInformation.image.rows - 1) // Check out of bounds
 									|| yOfPoint + index1 < 0
@@ -5945,6 +5942,7 @@ void thesis_testOnSingularInputImage_withoutLines()
 					}
 
 					if (matchingStarsNb == constellationPoints.size())
+					//if (matchingStarsNb > 15)
 					{
 						meanLuminosity /= matchingStarsNb;
 
@@ -6590,12 +6588,12 @@ void testConstellationPreprocessingOnSelectedImage()
 		Mat starsOnly = filterForStars(src);
 		imshow("Stars only", starsOnly);
 
-		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 2, WHITE, BLACK);
-		//erosionDilation = dilateNTimesWithParams(erosionDilation, 2, WHITE, BLACK);
+		Mat erosionDilation = erodeNTimesWithParams(starsOnly, 1, WHITE, BLACK);
+		erosionDilation = dilateNTimesWithParams(erosionDilation, 1, WHITE, BLACK);
 		//erosionDilation = erodeNTimesWithParams(starsOnly, 3, WHITE, BLACK);
 		//erosionDilation = dilateNTimesWithParams(erosionDilation, 3, WHITE, BLACK);
 		//imshow("Erosion & Dilation", erosionDilation);
-		Mat erosionDilation = starsOnly;
+		//Mat erosionDilation = starsOnly;
 
 		Mat labels = computeLabelsMatrixBFS(erosionDilation);
 

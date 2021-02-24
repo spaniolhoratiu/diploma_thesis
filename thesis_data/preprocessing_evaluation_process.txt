@@ -1,12 +1,25 @@
 Idea: variables in terms of constellation nb. of points
+Luminosity = LTY, if not specified, then it's 10
 
 Preprocessing + test set:
-00. andromeda - ok. reduced nb. of stars to 6
-01. antilia - not sure where it is in Stellarium. preprocessing ok.
-02. apus - ok. TDT=0.1 to recognize on 1.png
-03.
-04.
-05.
-06. aries - ok
+0. andromeda - ok. reduced nb. of stars to 6
+1. antilia - not sure where it is in Stellarium. preprocessing ok.
+2. apus - ok. TDT=0.1 to recognize on 1.png
+3. aquarius - ok. reduced nb. of stars to 15. need big PV to detect
+4. aquila - ok. reduced nb. of stars to 8. TDT=0.1 to recognize on 1.png
+5. ara - ok. TDT=0.02 to recognize on 1.png
+6. aries - ok
+7. auriga - ok. TDT=0.05 to recognize on 1.png
+8. bootes - ok. AT=2 TDT=0.1 PV=10 to recognize on 1.png
+9. caelum - ok. TDT=0.01, AT=3, PV=5 to recognize on 1.png
+10. camelopardis - ok w/ reduced 1 star. TDT=0.05, AT=2, PV=10, LTY=7
 11. cancer - ok
+12. canes venatici - cannot be done. only 2 stars in constellation
+13. canis major - ok. TDT=0.1, AT=2, PV=5
+14. canis minor - cannot be done. cannot differentiate the 3 stars
+15. capricornus - ok. TDT=0.05, AT=2, PV=5
+16. carina - ok. reduced nb of stars by ~5 because of Stellarium. TDT=0.05, AT=2, PV=5
+17. cassiopeia - ok. TDT=0.02, AT=2, PV=5
+18. centaurus - ok. reduced nb of stars by 4 for better performance & detection. TDT=0.01, AT=3, PV=5
+19. 
 47. lepus - ok
