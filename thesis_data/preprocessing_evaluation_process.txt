@@ -3,23 +3,42 @@ Luminosity = LTY, if not specified, then it's 10
 
 Preprocessing + test set:
 0. andromeda - ok. reduced nb. of stars to 6
-1. antilia - not sure where it is in Stellarium. preprocessing ok.
-2. apus - ok. TDT=0.1 to recognize on 1.png
+1. antilia - not ok. not sure where it is in Stellarium. preprocessing ok.
+2. apus - ok. TDT=0.1
 3. aquarius - ok. reduced nb. of stars to 15. need big PV to detect
-4. aquila - ok. reduced nb. of stars to 8. TDT=0.1 to recognize on 1.png
-5. ara - ok. TDT=0.02 to recognize on 1.png
+4. aquila - ok. TDT=0.1. reduced nb. of stars to 8. 
+5. ara - ok. TDT=0.02 
 6. aries - ok
 7. auriga - ok. TDT=0.05 to recognize on 1.png
-8. bootes - ok. AT=2 TDT=0.1 PV=10 to recognize on 1.png
+8. bootes - ok. TDT=0.1 AT=2 PV=10 to recognize on 1.png
 9. caelum - ok. TDT=0.01, AT=3, PV=5 to recognize on 1.png
-10. camelopardis - ok w/ reduced 1 star. TDT=0.05, AT=2, PV=10, LTY=7
+10. camelopardis - ok TDT=0.05, AT=2, PV=10, LTY=7.  reduced 1 star. 
 11. cancer - ok
 12. canes venatici - cannot be done. only 2 stars in constellation
 13. canis major - ok. TDT=0.1, AT=2, PV=5
 14. canis minor - cannot be done. cannot differentiate the 3 stars
 15. capricornus - ok. TDT=0.05, AT=2, PV=5
-16. carina - ok. reduced nb of stars by ~5 because of Stellarium. TDT=0.05, AT=2, PV=5
+16. carina - ok.  TDT=0.05, AT=2, PV=5. reduced nb of stars by ~5 because of Stellarium.
 17. cassiopeia - ok. TDT=0.02, AT=2, PV=5
-18. centaurus - ok. reduced nb of stars by 4 for better performance & detection. TDT=0.01, AT=3, PV=5
-19. 
+18. centaurus - ok.  TDT=0.01, AT=3, PV=5. reduced nb of stars by 4 for better performance & detection.
+19. cepheus - ok. TDT=0.05, AT=3, PV=5
+20. cetus - ok. TDT=0.7, AT=0/1, PV=10. reduced nb of stars by 1: Stellarium has a shining star that is nearly impossible to see. 
+21. chamaeleon - ok. TDT= 0.1, AT=3, PV=5
+22. circinus - ok. TDT=0.01, AT=3, PV=3
+23. columba - ok. TDT=0.05, AT=3, PV=5
+24. coma berenices - ok. TDT=0.05, AT=3, PV=5
+25. corona australis - ok. TDT=0.5, AT=3, PV=3
+26. corona borealis - ok. TDT=0.05, AT=3, PV=3
+27. corvus - ok. TDT=0.05, AT=3, PV=3
+28. crater - ok. TDT=0.05, AT=3, PV=3
+29. crux - ok. TDT=0.05, AT=3 -maybe bigger, PV=1; LTY = ~100 maybe
+30. cygnus - ok. TDT=0.05, AT=3, PV=5
+31. delphinus - ok. TDT=0.05, AT=3, PV=5
+32. dorado - ok. TDT=0.05, AT=3, PV=5
+33. draco - ok. TDT=0.05, AT=2, PV=10. reduced nb of stars by 4. hard to detect as model and Stellarium depiction is slightly different
+34. equuleus - not ok. TDT=0.05, AT=1, PV=5. does not find correct solution
+35. eridanus - ok. TDT=0.5, AT=2, PV=10. reduced from 24 to 12 stars stars(very big constellation)
+36. fornax- not ok. hard to detect due to low nb of stars(3)
+37. gemini - ok. TDT=0.03, AT=3, PV=4. tight PV in order to avoid misclassification
+38.
 47. lepus - ok
