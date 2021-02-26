@@ -5736,13 +5736,13 @@ void thesis_testOnSingularInputImage_withoutLines()
 	char fname[MAX_PATH];
 	Mat src;
 	const int BINARIZATION_THRESHOLD = 25;
-	const double LUMINOSITY_THRESHOLD = 10.0f;
+	const double LUMINOSITY_THRESHOLD = 7.0f;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
-	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.03; // Values to test: 0.01, 0.05
+	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.05; // Values to test: 0.01, 0.05
 	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
-	const int POSITION_VARIATION = 4; // Values to test : 2, 3, 5
-	const int TARGET_CONSTELLATION = 37;
+	const int POSITION_VARIATION = 5; // Values to test : 2, 3, 5
+	const int TARGET_CONSTELLATION = 54;
 
 	while (openFileDlg(fname))
 	{
@@ -5942,7 +5942,7 @@ void thesis_testOnSingularInputImage_withoutLines()
 					}
 
 					if (matchingStarsNb == constellationPoints.size())
-					//if (matchingStarsNb > 15)
+					//if (matchingStarsNb > 10)
 					{
 						meanLuminosity /= matchingStarsNb;
 
@@ -6589,7 +6589,7 @@ void testConstellationPreprocessingOnSelectedImage()
 		imshow("Stars only", starsOnly);
 
 		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 2, WHITE, BLACK);
-		//erosionDilation = dilateNTimesWithParams(erosionDilation, 2, WHITE, BLACK);
+		//erosionDilation = dilateNTimesWithParams(erosionDilation, 1, WHITE, BLACK);
 		//erosionDilation = erodeNTimesWithParams(starsOnly, 3, WHITE, BLACK);
 		//erosionDilation = dilateNTimesWithParams(erosionDilation, 3, WHITE, BLACK);
 		//imshow("Erosion & Dilation", erosionDilation);

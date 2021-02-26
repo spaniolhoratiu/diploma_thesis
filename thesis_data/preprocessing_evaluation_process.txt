@@ -40,5 +40,23 @@ Preprocessing + test set:
 35. eridanus - ok. TDT=0.5, AT=2, PV=10. reduced from 24 to 12 stars stars(very big constellation)
 36. fornax- not ok. hard to detect due to low nb of stars(3)
 37. gemini - ok. TDT=0.03, AT=3, PV=4. tight PV in order to avoid misclassification
-38.
+38. grus - ok. TDT=0.05, AT=3, PV=5. removed double stars from model
+39. hercules - ok. TDT=0.05, AT=3, PV=5. reduced to 15 stars
+	- !!! searching in Stellarium for Hercules points to the star instead of the constellation
+	- mb not the best pictures? check again
+40. horologium - ok. TDT=0.05, AT=3, PV=2, LTY=5.
+41. hydra - ok. TDT=0.05, AT=5, PV=9. reduced nb of stars to 10
+42. hydrus - ok. TDT=0.02, AT=5, PV=3, LTY=20
+43. indus - ok. TDT=0.02, AT=3, PV=5
+44. lacerta - ok. TDT=0.05, AT=3, PV=5
+45. leo - ok. TDT=0.01, AT=3, PV=10
+46. leo minor - ok. TDT=0.05, AT=3, PV=3
 47. lepus - ok
+48. libra - ok. TDT=0.05, AT=3, PV=5
+49. lupus - ok. TDT=0.01, AT=3, PV=5
+50. lynx - ok. TDT=0.05, AT=3, PV=5. might need to lower LTY, AT
+51. lyra - ok. TDT=0.05, AT=3, PV=5. modified model to removed double stars
+52. mensa - ok. TDT=0.05, AT=3, PV=1
+53. microscopium - ok. TDT=0.05, AT=3, PV=5
+54. monoceros - ok. TDT=0.05, AT=3, PV=5, LTY=7
+55.
