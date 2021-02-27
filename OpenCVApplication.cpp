@@ -5736,13 +5736,13 @@ void thesis_testOnSingularInputImage_withoutLines()
 	char fname[MAX_PATH];
 	Mat src;
 	const int BINARIZATION_THRESHOLD = 25;
-	const double LUMINOSITY_THRESHOLD = 7.0f;
+	const double LUMINOSITY_THRESHOLD = 10.0f;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
 	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.05; // Values to test: 0.01, 0.05
 	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
 	const int POSITION_VARIATION = 5; // Values to test : 2, 3, 5
-	const int TARGET_CONSTELLATION = 54;
+	const int TARGET_CONSTELLATION = 73;
 
 	while (openFileDlg(fname))
 	{

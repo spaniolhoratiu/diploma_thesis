@@ -59,4 +59,23 @@ Preprocessing + test set:
 52. mensa - ok. TDT=0.05, AT=3, PV=1
 53. microscopium - ok. TDT=0.05, AT=3, PV=5
 54. monoceros - ok. TDT=0.05, AT=3, PV=5, LTY=7
-55.
+55. musca - ok. TDT=0.05, AT=3, PV=5
+56. norma - ok. TDT=0.05, AT=3, PV=5
+57. octants - ok. TDT=0.02, AT=3, PV=5
+58. ophiucus - ok. TDT=0.05, AT=3, PV=5. removed low luminosity stars
+59. orion - ok. TDT=0.05, AT=7, PV=3. removed low luminosity stars
+60. pavo - ok. TDT=0.05, AT=5, PV=3. removed double star
+61. pegasus - ok. TDT=0.05, AT=3, PV=3
+62. perseus - ok. TDT=0.005,AT=5, PV=3. removed low luminosity stars
+63. phoenix - ok. TDT=0.05, AT=3, PV=5.
+64. pictor - not ok. hard to detect due to low nb of stars(3). false detections even with TDT=0.05, AT=7, PV=3 
+65. piscis austrinus - ok. TDT=0.05, AT=3, PV=3
+66. pisces - ok. TDT=0.05, AT=3, PV=10. removed low luminosity stars
+67. puppis - ok. TDT=0.02, AT=3, PV=3
+68. pyxis - ok. TDT=0.02, AT=3, PV=3
+69. reticulum - ok. TDT=0.02, AT=3, PV=3
+70. sagitta - ok. TDT=0.05, AT=7, PV=5
+71. sagittarius - ok. TDT=0.01, AT=5, PV=3
+72. scorpius - ok. TDT=0.05, AT=5, PV=3. removed double stars
+73. sculptor - ok. TDT=0.01, AT=3, PV=5.
+74.
