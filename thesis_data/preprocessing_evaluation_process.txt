@@ -78,4 +78,18 @@ Preprocessing + test set:
 71. sagittarius - ok. TDT=0.01, AT=5, PV=3
 72. scorpius - ok. TDT=0.05, AT=5, PV=3. removed double stars
 73. sculptor - ok. TDT=0.01, AT=3, PV=5.
-74.
+74. scutum - ok. TDT=0.05, AT=3, PV=3
+75. serpens cauda - ok. TDT=0.05, AT=3, PV=3
+76. serpens caput - ok. TDT=0.05, AT=3, PV=3. removed double star
+77. sextans - ok. TDT=0.05, AT=2, PV=5
+78. taurus - ok. TDT=0.02, AT=3, PV=5
+79. telescopium - not ok. hard to detect due to low nb of stars(3). false detections even with TDT=0.05, AT=3, PV=5
+80. triangulum australe- not ok. hard to detect due to low nb of stars(3). could maybe use TDT=0.01, AT=3, PV=5, LTY=100 to detect
+81. triangulum - not ok. hard to detect due to low nb of stars(3). could maybe use TDT=0.1, AT=3, PV=5, LTY=90 to detect
+82. tucana - ok. TDT=0.01, AT=3, PV=5
+83. ursa major - ok. TDT=0.05, AT=3, PV=5
+84. ursa minor - ok. TDT=0.05, AT=3, PV=5
+85. vela - ok. TDT=0.02, AT=3, PV=3
+86. virgo - ok. TDT=0.05, AT=3, PV=10
+87. volans - ok. TDT=0.05, AT=3, PV=3
+88. vulpecula - not ok.hard to detect due to low nb of stars(3, from which 2 of them are close together)

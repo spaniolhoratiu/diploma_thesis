@@ -5741,8 +5741,8 @@ void thesis_testOnSingularInputImage_withoutLines()
 
 	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.05; // Values to test: 0.01, 0.05
 	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
-	const int POSITION_VARIATION = 5; // Values to test : 2, 3, 5
-	const int TARGET_CONSTELLATION = 73;
+	const int POSITION_VARIATION = 3; // Values to test : 2, 3, 5
+	const int TARGET_CONSTELLATION = 88;
 
 	while (openFileDlg(fname))
 	{
