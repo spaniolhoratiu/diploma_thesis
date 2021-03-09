@@ -1,6 +1,8 @@
 Idea: variables in terms of constellation nb. of points
 Luminosity = LTY, if not specified, then it's 10
 
+!!! When testing on a single image with all constellations, make sure to keep track of AREA of each star;
+
 Preprocessing + test set:
 0. andromeda - ok. reduced nb. of stars to 6
 1. antilia - not ok. not sure where it is in Stellarium. preprocessing ok.
