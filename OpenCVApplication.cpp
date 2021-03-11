@@ -5739,10 +5739,10 @@ void thesis_testOnSingularInputImage_withoutLines()
 	const double LUMINOSITY_THRESHOLD = 10.0f;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
-	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.05; // Values to test: 0.01, 0.05
-	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
-	const int POSITION_VARIATION = 3; // Values to test : 2, 3, 5
-	const int TARGET_CONSTELLATION = 88;
+	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.1; // Values to test: 0.01, 0.05
+	const int AREA_THRESHOLD = 2; // Values to test : 3, 2
+	const int POSITION_VARIATION = 10; // Values to test : 2, 3, 5
+	const int TARGET_CONSTELLATION = 3;
 
 	while (openFileDlg(fname))
 	{
@@ -6005,10 +6005,10 @@ void thesis_testOnSingularInputImage_withoutLines()
 }
 
 
-double trianglesDifferenceThresholds[89] = {0.05, 0.05, 0.1, };
-int areaThresholds[89] = {3, 3, 5, };
-int positionVariations[89] = {5, 5, 5, };
-double luminosities[89] = {10.0f, 10.0f, 10.0f, };
+double trianglesDifferenceThresholds[89] = {0.05, 0.05, };
+int areaThresholds[89] = {3, 3,  };
+int positionVariations[89] = {5, 5, };
+double luminosities[89] = {10.0f, 10.0f,  };
 
 void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 {
@@ -6020,10 +6020,10 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 
 	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.1; // Values to test: 0.01, 0.03, 0.05
 	const int AREA_THRESHOLD = 5; // Values to test : 3, 2
-	const int POSITION_VARIATION = 5; // Values to test: 2, 3, 5
+	const int POSITION_VARIATION = 12; // Values to test: 2, 3, 5
 	
 	// Evaluation
-	const int TARGET_CONSTELLATION = 2;
+	const int TARGET_CONSTELLATION = 4;
 	int NB_IMAGES = 10;
 	int totalMatches = 0;
 	bool falseDetection = false;
@@ -6069,6 +6069,7 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 			inputPoints.size(),
 			inputTriangles.size());
 
+		std::vector<double> srcMatchingPointsLuminosity;
 		std::vector<std::vector<Point>> srcMatchingPoints; // All sets of matched points found in source image
 		std::vector<int> srcMatchingPointsCounter; // Count the number of times the set is matched
 
@@ -6232,6 +6233,17 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 					{
 						meanLuminosity /= matchingStarsNb;
 
+						bool setWithBetterLuminosityAlreadyFound = false;
+						for (int j = 0; j < srcMatchingPointsLuminosity.size(); j++) // Keep 
+						{
+							if (meanLuminosity < srcMatchingPointsLuminosity[j])
+							{
+								setWithBetterLuminosityAlreadyFound = true;
+								break;
+							}
+						}
+						if (setWithBetterLuminosityAlreadyFound) break;
+
 						sort(srcMatchingPointsCurrent.begin(), srcMatchingPointsCurrent.end(), MyPointSorter);
 						bool setAlreadyFound = false;
 						for (int j = 0; j < srcMatchingPoints.size(); j++)
@@ -6247,9 +6259,10 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 
 						if (!setAlreadyFound && meanLuminosity > LUMINOSITY_THRESHOLD)
 						{
+							srcMatchingPointsLuminosity.push_back(meanLuminosity);
 							srcMatchingPoints.push_back(srcMatchingPointsCurrent);
 							srcMatchingPointsCounter.push_back(1);
-							printf("Image %d Pair %i Matching stars = %d, Difference = %lf, Luminosity=%lf", imageIndex, i, matchingStarsNb, currentPair.difference, meanLuminosity);
+							printf("Image %d Pair %i Matching stars = %d, Difference = %lf, Luminosity=%lf\n", imageIndex, i, matchingStarsNb, currentPair.difference, meanLuminosity);
 							
 							iterationMatches++;
 
@@ -6310,7 +6323,7 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 		{
 			printf("\n\nPossible false detections!!!\tFound %d detections on image %d.\n", iterationMatches, imageIndex);
 			falseDetection = true;
-			break;
+			//break;
 		}
 		else
 		{
