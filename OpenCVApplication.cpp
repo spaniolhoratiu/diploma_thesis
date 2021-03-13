@@ -6019,11 +6019,11 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
 	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.1; // Values to test: 0.01, 0.03, 0.05
-	const int AREA_THRESHOLD = 5; // Values to test : 3, 2
-	const int POSITION_VARIATION = 12; // Values to test: 2, 3, 5
+	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
+	const int POSITION_VARIATION = 7; // Values to test: 2, 3, 5
 	
 	// Evaluation
-	const int TARGET_CONSTELLATION = 4;
+	const int TARGET_CONSTELLATION = 18;
 	int NB_IMAGES = 10;
 	int totalMatches = 0;
 	bool falseDetection = false;
@@ -6034,7 +6034,9 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 		sprintf(fname, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//evaluation_images//%d//%d.png", TARGET_CONSTELLATION, imageIndex);
 
 		src = imread(fname, IMREAD_GRAYSCALE);
-		//imshow("Source", src);
+		//char bufferSrc[50];
+		//sprintf(bufferSrc, "Src %d", imageIndex);
+		//imshow(bufferSrc, src);
 
 		Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
 		//char buffer[50];
@@ -6069,7 +6071,6 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 			inputPoints.size(),
 			inputTriangles.size());
 
-		std::vector<double> srcMatchingPointsLuminosity;
 		std::vector<std::vector<Point>> srcMatchingPoints; // All sets of matched points found in source image
 		std::vector<int> srcMatchingPointsCounter; // Count the number of times the set is matched
 
@@ -6233,17 +6234,6 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 					{
 						meanLuminosity /= matchingStarsNb;
 
-						bool setWithBetterLuminosityAlreadyFound = false;
-						for (int j = 0; j < srcMatchingPointsLuminosity.size(); j++) // Keep 
-						{
-							if (meanLuminosity < srcMatchingPointsLuminosity[j])
-							{
-								setWithBetterLuminosityAlreadyFound = true;
-								break;
-							}
-						}
-						if (setWithBetterLuminosityAlreadyFound) break;
-
 						sort(srcMatchingPointsCurrent.begin(), srcMatchingPointsCurrent.end(), MyPointSorter);
 						bool setAlreadyFound = false;
 						for (int j = 0; j < srcMatchingPoints.size(); j++)
@@ -6257,9 +6247,10 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 							}
 						}
 
+
+
 						if (!setAlreadyFound && meanLuminosity > LUMINOSITY_THRESHOLD)
 						{
-							srcMatchingPointsLuminosity.push_back(meanLuminosity);
 							srcMatchingPoints.push_back(srcMatchingPointsCurrent);
 							srcMatchingPointsCounter.push_back(1);
 							printf("Image %d Pair %i Matching stars = %d, Difference = %lf, Luminosity=%lf\n", imageIndex, i, matchingStarsNb, currentPair.difference, meanLuminosity);
