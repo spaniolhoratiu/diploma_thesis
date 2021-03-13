@@ -6020,10 +6020,10 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 
 	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.1; // Values to test: 0.01, 0.03, 0.05
 	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
-	const int POSITION_VARIATION = 7; // Values to test: 2, 3, 5
+	const int POSITION_VARIATION = 10; // Values to test: 2, 3, 5
 	
 	// Evaluation
-	const int TARGET_CONSTELLATION = 18;
+	const int TARGET_CONSTELLATION = 39;
 	int NB_IMAGES = 10;
 	int totalMatches = 0;
 	bool falseDetection = false;
