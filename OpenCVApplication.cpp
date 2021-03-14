@@ -6015,18 +6015,20 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 	char fname[MAX_PATH];
 	Mat src;
 	const int BINARIZATION_THRESHOLD = 25;
-	const double LUMINOSITY_THRESHOLD = 10.0f;
+	const double LUMINOSITY_THRESHOLD = 10.0;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
-	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.1; // Values to test: 0.01, 0.03, 0.05
+	const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.05; // Values to test: 0.01, 0.03, 0.05
 	const int AREA_THRESHOLD = 3; // Values to test : 3, 2
-	const int POSITION_VARIATION = 10; // Values to test: 2, 3, 5
-	
+	const int POSITION_VARIATION = 3; // Values to test: 2, 3, 5
+
 	// Evaluation
-	const int TARGET_CONSTELLATION = 39;
+	const int TARGET_CONSTELLATION = 72;
 	int NB_IMAGES = 10;
 	int totalMatches = 0;
 	bool falseDetection = false;
+
+	int detectionsOnImage[10] = { 0 };
 	
 	for (int imageIndex = 1; imageIndex <= NB_IMAGES; imageIndex++)
 	{
@@ -6199,33 +6201,37 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 						if (xOfPoint > centerOfMassInformation.image.cols || xOfPoint < 0) break;
 
 						bool brokeInnerLoop = false;
-						for (int index1 = (-1 * POSITION_VARIATION); index1 <= POSITION_VARIATION; index1++)
+						for (int index0 = 0; index0 <= POSITION_VARIATION; index0++)
 						{
-							for (int index2 = (-1 * POSITION_VARIATION); index2 <= POSITION_VARIATION; index2++)
+							for (int index1 = (-1 * index0); index1 <= index0; index1++)
 							{
-								if (yOfPoint + index1 > (centerOfMassInformation.image.rows - 1) // Check out of bounds
-									|| yOfPoint + index1 < 0
-									|| xOfPoint + index2 >(centerOfMassInformation.image.cols - 1)
-									|| xOfPoint + index2 < 0
-									)
+								for (int index2 = (-1 * index0); index2 <= index0; index2++)
 								{
-									brokeInnerLoop = true;
-									break;
+									if (yOfPoint + index1 > (centerOfMassInformation.image.rows - 1) // Check out of bounds
+										|| yOfPoint + index1 < 0
+										|| xOfPoint + index2 >(centerOfMassInformation.image.cols - 1)
+										|| xOfPoint + index2 < 0
+										)
+									{
+										brokeInnerLoop = true;
+										break;
+									}
+									if (centerOfMassInformation.image.at<uchar>(yOfPoint + index1, xOfPoint + index2) == WHITE)
+									{
+										srcMatchingPointsCurrent.push_back(Point(xOfPoint + index2, yOfPoint + index1));
+										meanLuminosity += centerOfMassInformation.areasMat.at<int>(yOfPoint + index1, xOfPoint + index2);
+										matchingStarsNb++;
+										matchedIndexes.push_back(j);
+										brokeInnerLoop = true;
+										break;
+									}
 								}
-								if (centerOfMassInformation.image.at<uchar>(yOfPoint + index1, xOfPoint + index2) == WHITE)
-								{
-									srcMatchingPointsCurrent.push_back(Point(xOfPoint + index2, yOfPoint + index1));
-									meanLuminosity += centerOfMassInformation.areasMat.at<int>(yOfPoint + index1, xOfPoint + index2);
-									matchingStarsNb++;
-									matchedIndexes.push_back(j);
-									brokeInnerLoop = true;
-									break;
-								}
+
+								if (brokeInnerLoop) break;
 							}
 
 							if (brokeInnerLoop) break;
 						}
-
 					}
 
 
@@ -6303,6 +6309,8 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 							//auto endTime = std::chrono::high_resolution_clock::now();
 							//auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
 							//printf(" Execution time:%d \n", duration);
+
+							detectionsOnImage[imageIndex]++;
 						}
 					}
 				}
@@ -6324,8 +6332,20 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 
 	if (!falseDetection)
 	{
-		printf("\n\nMatches: %d out of %d\n", totalMatches, NB_IMAGES);
+		printf("\n\nNo multiple detections.\n");
+		printf("Matches: %d out of %d\n", totalMatches, NB_IMAGES);
 		printf("Success rate: %lf\n", (double)totalMatches / NB_IMAGES);
+	}
+	else
+	{
+		printf("\n\nMulitple detections on 1 image found.\n");
+		for (int i = 0; i < 10; i++)
+		{
+			if (detectionsOnImage[i] > 1)
+			{
+				printf("Image %d: %d detections\n", i, detectionsOnImage[i]);
+			}
+		}
 	}
 
 	Mat aux = Mat::zeros(100, 100, CV_8UC1);
