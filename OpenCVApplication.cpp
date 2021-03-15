@@ -6023,7 +6023,7 @@ void thesis_evaluation_noLines_onTargetConstellation_onFolder()
 	const int POSITION_VARIATION = 3; // Values to test: 2, 3, 5
 
 	// Evaluation
-	const int TARGET_CONSTELLATION = 72;
+	const int TARGET_CONSTELLATION = 87;
 	int NB_IMAGES = 10;
 	int totalMatches = 0;
 	bool falseDetection = false;
