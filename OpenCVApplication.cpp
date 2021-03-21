@@ -6811,8 +6811,8 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 	const int BINARIZATION_THRESHOLD = 25;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 
-	int SELECTION_CONSTELLATION = 51;
-	int SELECTION_IMAGE = 7;
+	int SELECTION_CONSTELLATION = 25;
+	int SELECTION_IMAGE = 4;
 
 	double params_triangDiffThresh[NUMBER_OF_CONSTELLATIONS];
 	int params_areaThresh[NUMBER_OF_CONSTELLATIONS];
@@ -6829,6 +6829,7 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 	if (detectionParamsFp == NULL)
 	{
 		printf("Could not open detection params file.\n");
+		return;
 	}
 	else
 	{
@@ -7063,28 +7064,31 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 					{
 						meanLuminosity /= srcMatchingPointsCurrent.size();
 
-						//sort(srcMatchingPointsCurrent.begin(), srcMatchingPointsCurrent.end(), MyPointSorter);
-						//std::set<Point, PointCompare>::iterator iterator;
-						bool setAlreadyFound = false;
+						//bool setAlreadyFound = false;
 
-						if (matchingSrcPoints.find(srcMatchingPointsCurrent) != matchingSrcPoints.end())
+						int previousSize = matchingSrcPoints.size();
+
+						//if (matchingSrcPoints.find(srcMatchingPointsCurrent) != matchingSrcPoints.end())
+						//{
+						//	//srcMatchingPointsCurrentCounter = matchingSrcPointsCounter[j];
+						//	//int index = matchingSrcPoints.find(srcMatchingPointsCurrent);
+						//	//matchingSrcPointsCounter[]++;
+						//	setAlreadyFound = true;
+						//	break;
+						//}
+
+						//if (!setAlreadyFound && meanLuminosity > params_lum[currentConstellationNumber])
+						if (meanLuminosity > params_lum[currentConstellationNumber])
 						{
-							//srcMatchingPointsCurrentCounter = matchingSrcPointsCounter[j];
-							//int index = matchingSrcPoints.find(srcMatchingPointsCurrent);
-							//matchingSrcPointsCounter[]++;
-							setAlreadyFound = true;
-							break;
-						}
-
-
-
-						if (!setAlreadyFound && meanLuminosity > params_lum[currentConstellationNumber])
-						{
-							currentIterationMatches++;
-
 							matchingSrcPoints.insert(srcMatchingPointsCurrent);
-							Detection detection(srcMatchingPointsCurrent, currentPair, meanLuminosity, params_methodsMultDetect[currentConstellationNumber]);
-							allDetections.push_back(detection);
+							if (matchingSrcPoints.size() > previousSize)
+							{
+								currentIterationMatches++;
+
+								//matchingSrcPoints.insert(srcMatchingPointsCurrent);
+								Detection detection(srcMatchingPointsCurrent, currentPair, meanLuminosity, params_methodsMultDetect[currentConstellationNumber]);
+								allDetections.push_back(detection);
+							}
 						}
 					}
 				}
@@ -7200,8 +7204,6 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 		waitKey(0);
 	}
 }
-
-
 
 // Abandoned because running it resulted in a bluescreen.
 void thesis_testOnRandomSelectionsFromFile_withAllConstellations_withoutLines()
@@ -7622,7 +7624,6 @@ void thesis_testOnRandomSelectionsFromFile_withAllConstellations_withoutLines()
 	}
 }
 
-
 Mat dilateNTimesWithParams(Mat src, int n, int objectValue, int backgroundValue)
 {
 	int height = src.rows;
@@ -7782,18 +7783,30 @@ void writeConstellationInfoInFile(std::vector<Point> points, std::vector<Triangl
 	}
 }
 
-
-
 void testing()
 {
-	int target_thread_num = 100;
-	omp_set_num_threads(target_thread_num);
+	//int a;
+	//scanf("%d", &a);
+	//if (a == 1)
+	//{
+	//	printf("Test\n");
+	//	return;
+	//}
+	//else
+	//{
+	//	Mat newImg(100, 100, CV_8UC1, 0);
+	//	imshow("img", newImg);
+	//}
 
-	#pragma omp parallel for
-	for (int i = 1; i < 100; ++i)
-	{
-		printf("%d\n", omp_get_thread_num());
-	}
+
+	//int target_thread_num = 100;
+	//omp_set_num_threads(target_thread_num);
+
+	//#pragma omp parallel for
+	//for (int i = 1; i < 100; ++i)
+	//{
+	//	printf("%d\n", omp_get_thread_num());
+	//}
 
 
 	//std::set<Point, PointCompare> testSet; // All sets of matched points found in source image
@@ -7817,10 +7830,10 @@ void testing()
 	//
 
 	//printf("abcd");
-	int a;
-	scanf("%d\n", &a);
+	//int a;
+	//scanf("%d\n", &a);
 
-	waitKey(0);
+	//waitKey(0);
 }
 
 void testConstellationPreprocessingOnSelectedImage()
