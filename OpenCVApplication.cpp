@@ -6678,29 +6678,20 @@ void thesis_testOnSingularInputImage_withAllConstellations_withoutLines()
 						if (srcMatchingPointsCurrent.size() == constellationPoints.size())
 						{
 							meanLuminosity /= srcMatchingPointsCurrent.size();
-
-							//sort(srcMatchingPointsCurrent.begin(), srcMatchingPointsCurrent.end(), MyPointSorter);
-							//std::set<Point, PointCompare>::iterator iterator;
-							bool setAlreadyFound = false;
-
-							if (matchingSrcPoints.find(srcMatchingPointsCurrent) != matchingSrcPoints.end())
-							{
-								//srcMatchingPointsCurrentCounter = matchingSrcPointsCounter[j];
-								//int index = matchingSrcPoints.find(srcMatchingPointsCurrent);
-								//matchingSrcPointsCounter[]++;
-								setAlreadyFound = true;
-								break;
-							}
 							
+							int previousSize = matchingSrcPoints.size();
 
-
-							if (!setAlreadyFound && meanLuminosity > params_lum[currentConstellationNumber])
+							if (meanLuminosity > params_lum[currentConstellationNumber])
 							{
-								currentIterationMatches++;
-								
 								matchingSrcPoints.insert(srcMatchingPointsCurrent);
-								Detection detection(srcMatchingPointsCurrent, currentPair, meanLuminosity, params_methodsMultDetect[currentConstellationNumber]);
-								allDetections.push_back(detection);
+								if (matchingSrcPoints.size() > previousSize)
+								{
+									currentIterationMatches++;
+
+									//matchingSrcPoints.insert(srcMatchingPointsCurrent);
+									Detection detection(srcMatchingPointsCurrent, currentPair, meanLuminosity, params_methodsMultDetect[currentConstellationNumber]);
+									allDetections.push_back(detection);
+								}
 							}
 						}
 					}
