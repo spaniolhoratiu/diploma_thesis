@@ -5426,7 +5426,7 @@ struct MyPointSorter {
 } MyPointSorter;
 
 struct PointCompare {
-	bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x < pt2.x || pt1.y < pt2.y); } // Sort based on y value.
+	bool operator() (cv::Point pt1, cv::Point pt2) { return (pt1.x < pt2.x || (pt1.x == pt2.x && pt1.y < pt2.y)); } 
 };
 
 struct Point2fCompare {
@@ -6423,6 +6423,7 @@ void thesis_testOnSingularInputImage_withAllConstellations_withoutLines()
 	const int BINARIZATION_THRESHOLD = 25;
 	//const double LUMINOSITY_THRESHOLD = 10.0f;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
+	const double DEGENERATE_THRESHOLD = 0.05;
 
 	//const double TRIANGLES_DIFFERENCE_THRESHOLD = 0.05; // Values to test: 0.01, 0.05
 	//const int AREA_THRESHOLD = 3; // Values to test : 3, 2
@@ -6510,6 +6511,13 @@ void thesis_testOnSingularInputImage_withAllConstellations_withoutLines()
 					Triangle triangle;
 					triangle.points = inputCombinations[i];
 					triangle.computeDistances();
+					double smallest2DistancesSum = triangle.distances.at(0).value + triangle.distances.at(1).value;
+					if (smallest2DistancesSum > triangle.distances.at(2).value - DEGENERATE_THRESHOLD
+						&& smallest2DistancesSum < triangle.distances.at(2).value + DEGENERATE_THRESHOLD
+						)
+					{
+						continue;
+					}
 					inputTriangles.push_back(triangle);
 				}
 				omp_unset_lock(&lock);
@@ -6801,8 +6809,9 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 	Mat src;
 	const int BINARIZATION_THRESHOLD = 25;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
+	const double DEGENERATE_THRESHOLD = 0.05;
 
-	int SELECTION_CONSTELLATION = 25;
+	int SELECTION_CONSTELLATION = 78;
 	int SELECTION_IMAGE = 4;
 
 	double params_triangDiffThresh[NUMBER_OF_CONSTELLATIONS];
@@ -6863,6 +6872,7 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 		omp_lock_t lock;
 		omp_init_lock(&lock);
 
+
 		omp_set_num_threads(NUMBER_OF_CONSTELLATIONS);
 		#pragma omp parallel for
 		for (int currentConstellationNumber = 0; currentConstellationNumber < NUMBER_OF_CONSTELLATIONS; currentConstellationNumber++)
@@ -6886,6 +6896,14 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 				Triangle triangle;
 				triangle.points = inputCombinations[i];
 				triangle.computeDistances();
+				double smallest2DistancesSum = triangle.distances.at(0).value + triangle.distances.at(1).value;
+				if (smallest2DistancesSum > triangle.distances.at(2).value - DEGENERATE_THRESHOLD
+					&& smallest2DistancesSum < triangle.distances.at(2).value + DEGENERATE_THRESHOLD
+					)
+				{
+					continue;
+				}
+					
 				inputTriangles.push_back(triangle);
 			}
 			omp_unset_lock(&lock);
@@ -6987,6 +7005,20 @@ void thesis_testOnSingularInputImageFromParameters_withAllConstellations_without
 					dstTri[0] = Point2f(currentPair.inputTriangle.points[0].x, currentPair.inputTriangle.points[0].y);
 					dstTri[1] = Point2f(currentPair.inputTriangle.points[1].x, currentPair.inputTriangle.points[1].y);
 					dstTri[2] = Point2f(currentPair.inputTriangle.points[2].x, currentPair.inputTriangle.points[2].y);
+
+					//if (currentPair.inputTriangle.distances.at(1).value >= 1.3834
+					//	&& currentPair.inputTriangle.distances.at(1).value <= 1.3836
+					//	&& currentPair.inputTriangle.distances.at(2).value >= 2.3834
+					//	&& currentPair.inputTriangle.distances.at(2).value <= 2.3836
+					//	&& currentPair.constellationTriangle.distances.at(1).value >= 1.4056
+					//	&& currentPair.constellationTriangle.distances.at(1).value <= 1.4058
+					//	&& currentPair.constellationTriangle.distances.at(2).value >= 2.3891
+					//	&& currentPair.constellationTriangle.distances.at(2).value <= 2.3893
+					//	)
+					//{
+					//	printf("abcd");
+					//}
+
 
 					Mat warp_mat = getAffineTransform(srcTri, dstTri);
 
@@ -7808,8 +7840,6 @@ void testing()
 	//testSet2.insert(Point(0, 1));
 	//testSet2.insert(Point(0, 0));
 	//
-
-
 	//std::set<std::set<Point, PointCompare>, SetOfPointsCompare> testSet3; // All sets of matched points found in source image
 	//testSet3.insert(testSet);
 	//testSet3.insert(testSet2);
