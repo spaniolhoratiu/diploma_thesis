@@ -6447,7 +6447,7 @@ void thesis_testOnSingularInputImage_withAllConstellations_withLines()
 	const int NUMBER_OF_CONSTELLATIONS = 89;
 	const double DEGENERATE_THRESHOLD = 0.05;
 
-	const int TARGET_CONSTELLATION = 74;
+	//const int TARGET_CONSTELLATION = 87;
 
 	double params_triangDiffThresh[NUMBER_OF_CONSTELLATIONS];
 	int params_areaThresh[NUMBER_OF_CONSTELLATIONS];
@@ -6507,9 +6507,9 @@ void thesis_testOnSingularInputImage_withAllConstellations_withLines()
 			omp_lock_t lock;
 			omp_init_lock(&lock);
 
-			//omp_set_num_threads(NUMBER_OF_CONSTELLATIONS);
-			//#pragma omp parallel for
-			for (int currentConstellationNumber = TARGET_CONSTELLATION; currentConstellationNumber < TARGET_CONSTELLATION+1; currentConstellationNumber++)
+			omp_set_num_threads(NUMBER_OF_CONSTELLATIONS);
+			#pragma omp parallel for
+			for (int currentConstellationNumber = 0; currentConstellationNumber < NUMBER_OF_CONSTELLATIONS; currentConstellationNumber++)
 			{
 				if (params_methodsMultDetect[currentConstellationNumber] == -1) continue;
 
