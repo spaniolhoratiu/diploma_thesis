@@ -1456,7 +1456,7 @@ public:
     /** @copybrief getBackpropWeightScale @see getBackpropWeightScale */
     CV_WRAP virtual void setBackpropWeightScale(double val) = 0;
 
-    /** BPROP: Strength of the momentum term (the difference between weights on the 2 previous iterations).
+    /** BPROP: Strength of the momentum term (the triangleDifference between weights on the 2 previous iterations).
     This parameter provides some inertia to smooth the random fluctuations of the weights. It can
     vary from 0 (the feature is disabled) to 1 and beyond. The value 0.1 or so is good enough.
     Default value is 0.1.*/

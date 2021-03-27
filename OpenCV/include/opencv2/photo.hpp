@@ -616,7 +616,7 @@ public:
 /** @brief Creates CalibrateRobertson object
 
 @param max_iter maximal number of Gauss-Seidel solver iterations.
-@param threshold target difference between results of two successive steps of the minimization.
+@param threshold target triangleDifference between results of two successive steps of the minimization.
  */
 CV_EXPORTS_W Ptr<CalibrateRobertson> createCalibrateRobertson(int max_iter = 30, float threshold = 0.01f);
 

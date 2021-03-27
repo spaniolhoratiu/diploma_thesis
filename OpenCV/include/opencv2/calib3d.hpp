@@ -1308,7 +1308,7 @@ rejected prior to computing the homographies. Otherwise, all the points are cons
 
 The function computes the rectification transformations without knowing intrinsic parameters of the
 cameras and their relative position in the space, which explains the suffix "uncalibrated". Another
-related difference from stereoRectify is that the function outputs not the rectification
+related triangleDifference from stereoRectify is that the function outputs not the rectification
 transformations in the object (3D) space, but the planar perspective transformations encoded by the
 homography matrices H1 and H2 . The function implements the algorithm @cite Hartley99 .
 
@@ -1717,7 +1717,7 @@ CV_EXPORTS_W void correctMatches( InputArray F, InputArray points1, InputArray p
 @param newVal The disparity value used to paint-off the speckles
 @param maxSpeckleSize The maximum speckle size to consider it a speckle. Larger blobs are not
 affected by the algorithm
-@param maxDiff Maximum difference between neighbor disparity pixels to put them into the same
+@param maxDiff Maximum triangleDifference between neighbor disparity pixels to put them into the same
 blob. Note that since StereoBM, StereoSGBM and may be other algorithms return a fixed-point
 disparity map, where disparity values are multiplied by 16, this scale factor should be taken into
 account when specifying this parameter value.
@@ -2060,7 +2060,7 @@ public:
     pixels. The algorithm requires P2 \> P1 . See stereo_match.cpp sample where some reasonably good
     P1 and P2 values are shown (like 8\*number_of_image_channels\*SADWindowSize\*SADWindowSize and
     32\*number_of_image_channels\*SADWindowSize\*SADWindowSize , respectively).
-    @param disp12MaxDiff Maximum allowed difference (in integer pixel units) in the left-right
+    @param disp12MaxDiff Maximum allowed triangleDifference (in integer pixel units) in the left-right
     disparity check. Set it to a non-positive value to disable the check.
     @param preFilterCap Truncation value for the prefiltered image pixels. The algorithm first
     computes x-derivative at each pixel and clips its value by [-preFilterCap, preFilterCap] interval.

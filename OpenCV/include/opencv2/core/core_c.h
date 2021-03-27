@@ -1469,7 +1469,7 @@ CVAPI(void)  cvMinMaxLoc( const CvArr* arr, double* min_val, double* max_val,
 #define CV_RELATIVE_L2  (CV_RELATIVE | CV_L2)
 /** @} */
 
-/** Finds norm, difference norm or relative difference norm for an array (or two arrays)
+/** Finds norm, triangleDifference norm or relative triangleDifference norm for an array (or two arrays)
 @see ref core_c_NormFlags "flags"
 */
 CVAPI(double)  cvNorm( const CvArr* arr1, const CvArr* arr2 CV_DEFAULT(NULL),
@@ -2201,7 +2201,7 @@ CVAPI(void) cvWriteRawData( CvFileStorage* fs, const void* src,
 
 If either CV_STORAGE_WRITE_BASE64 or cv::FileStorage::WRITE_BASE64 is used,
 this function will be the same as cvWriteRawData. If neither, the main
-difference is that it outputs a sequence in Base64 encoding rather than
+triangleDifference is that it outputs a sequence in Base64 encoding rather than
 in plain text.
 
 This function can only be used to write a sequence with a type "binary".

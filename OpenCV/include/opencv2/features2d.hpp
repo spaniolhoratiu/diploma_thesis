@@ -425,7 +425,7 @@ CV_EXPORTS void FAST( InputArray image, CV_OUT std::vector<KeyPoint>& keypoints,
 
 @param image grayscale image where keypoints (corners) are detected.
 @param keypoints keypoints detected on the image.
-@param threshold threshold on difference between intensity of the central pixel and pixels of a
+@param threshold threshold on triangleDifference between intensity of the central pixel and pixels of a
 circle around this pixel.
 @param nonmaxSuppression if true, non-maximum suppression is applied to detected corners
 (keypoints).
@@ -481,7 +481,7 @@ CV_EXPORTS void AGAST( InputArray image, CV_OUT std::vector<KeyPoint>& keypoints
 
 @param image grayscale image where keypoints (corners) are detected.
 @param keypoints keypoints detected on the image.
-@param threshold threshold on difference between intensity of the central pixel and pixels of a
+@param threshold threshold on triangleDifference between intensity of the central pixel and pixels of a
 circle around this pixel.
 @param nonmaxSuppression if true, non-maximum suppression is applied to detected corners
 (keypoints).

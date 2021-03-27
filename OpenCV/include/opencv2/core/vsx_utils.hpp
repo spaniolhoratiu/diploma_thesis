@@ -711,7 +711,7 @@ VSX_IMPL_LOAD_L8(vec_double2, double)
 #   define vec_cmpne(a, b) vec_not(vec_cmpeq(a, b))
 #endif
 
-// absoulte difference
+// absoulte triangleDifference
 #ifndef vec_absd
 #   define vec_absd(a, b) vec_sub(vec_max(a, b), vec_min(a, b))
 #endif

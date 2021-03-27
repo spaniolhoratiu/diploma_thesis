@@ -363,7 +363,7 @@ output array to be changed.
 CV_EXPORTS_W void add(InputArray src1, InputArray src2, OutputArray dst,
                       InputArray mask = noArray(), int dtype = -1);
 
-/** @brief Calculates the per-element difference between two arrays or array and a scalar.
+/** @brief Calculates the per-element triangleDifference between two arrays or array and a scalar.
 
 The function subtract calculates:
 - Difference between two arrays, when both input arrays have the same size and the same number of
@@ -375,7 +375,7 @@ number of elements as `src1.channels()`:
 - Difference between a scalar and an array, when src1 is constructed from Scalar or has the same
 number of elements as `src2.channels()`:
     \f[\texttt{dst}(I) =  \texttt{saturate} ( \texttt{src1} -  \texttt{src2}(I) ) \quad \texttt{if mask}(I) \ne0\f]
-- The reverse difference between a scalar and an array in the case of `SubRS`:
+- The reverse triangleDifference between a scalar and an array in the case of `SubRS`:
     \f[\texttt{dst}(I) =  \texttt{saturate} ( \texttt{src2} -  \texttt{src1}(I) ) \quad \texttt{if mask}(I) \ne0\f]
 where I is a multi-dimensional index of array elements. In case of multi-channel arrays, each
 channel is processed independently.
@@ -386,7 +386,7 @@ The first function in the list above can be replaced with matrix expressions:
     dst -= src1; // equivalent to subtract(dst, src1, dst);
 @endcode
 The input arrays and the output array can all have the same or different depths. For example, you
-can subtract to 8-bit unsigned arrays and store the difference in a 16-bit signed array. Depth of
+can subtract to 8-bit unsigned arrays and store the triangleDifference in a 16-bit signed array. Depth of
 the output array is determined by dtype parameter. In the second and third cases above, as well as
 in the first case, when src1.depth() == src2.depth(), dtype can be set to the default -1. In this
 case the output array will have the same depth as the input array, be it src1, src2 or both.
@@ -678,10 +678,10 @@ Hamming norms can only be calculated with CV_8U depth arrays.
 */
 CV_EXPORTS_W double norm(InputArray src1, int normType = NORM_L2, InputArray mask = noArray());
 
-/** @brief Calculates an absolute difference norm or a relative difference norm.
+/** @brief Calculates an absolute triangleDifference norm or a relative triangleDifference norm.
 
-This version of cv::norm calculates the absolute difference norm
-or the relative difference norm of arrays src1 and src2.
+This version of cv::norm calculates the absolute triangleDifference norm
+or the relative triangleDifference norm of arrays src1 and src2.
 The type of norm to calculate is specified using cv::NormTypes.
 
 @param src1 first input array.
@@ -1045,10 +1045,10 @@ The example scenarios of using the function are the following:
     top-left and bottom-left image origin. This is a typical operation
     in video processing on Microsoft Windows\* OS.
 *   Horizontal flipping of the image with the subsequent horizontal
-    shift and absolute difference calculation to check for a
+    shift and absolute triangleDifference calculation to check for a
     vertical-axis symmetry (flipCode \> 0).
 *   Simultaneous horizontal and vertical flipping of the image with
-    the subsequent shift and absolute difference calculation to check
+    the subsequent shift and absolute triangleDifference calculation to check
     for a central symmetry (flipCode \< 0).
 *   Reversing the order of point arrays (flipCode \> 0 or
     flipCode == 0).
@@ -1331,17 +1331,17 @@ specifies elements of the output array to be changed.
 CV_EXPORTS_W void bitwise_not(InputArray src, OutputArray dst,
                               InputArray mask = noArray());
 
-/** @brief Calculates the per-element absolute difference between two arrays or between an array and a scalar.
+/** @brief Calculates the per-element absolute triangleDifference between two arrays or between an array and a scalar.
 
 The function cv::absdiff calculates:
-*   Absolute difference between two arrays when they have the same
+*   Absolute triangleDifference between two arrays when they have the same
     size and type:
     \f[\texttt{dst}(I) =  \texttt{saturate} (| \texttt{src1}(I) -  \texttt{src2}(I)|)\f]
-*   Absolute difference between an array and a scalar when the second
+*   Absolute triangleDifference between an array and a scalar when the second
     array is constructed from Scalar or has as many elements as the
     number of channels in `src1`:
     \f[\texttt{dst}(I) =  \texttt{saturate} (| \texttt{src1}(I) -  \texttt{src2} |)\f]
-*   Absolute difference between a scalar and an array when the first
+*   Absolute triangleDifference between a scalar and an array when the first
     array is constructed from Scalar or has as many elements as the
     number of channels in `src2`:
     \f[\texttt{dst}(I) =  \texttt{saturate} (| \texttt{src1} -  \texttt{src2}(I) |)\f]
@@ -2480,7 +2480,7 @@ public:
     coordinates of projected vectors and reconstruct the original vectors.
     Unless all the principal components have been retained, the
     reconstructed vectors are different from the originals. But typically,
-    the difference is small if the number of components is large enough (but
+    the triangleDifference is small if the number of components is large enough (but
     still much smaller than the original vector dimensionality). As a
     result, PCA is used.
     @param vec coordinates of the vectors in the principal component

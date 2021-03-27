@@ -391,8 +391,8 @@ enum DistanceTransformLabelTypes {
 
 //! floodfill algorithm flags
 enum FloodFillFlags {
-    /** If set, the difference between the current pixel and seed pixel is considered. Otherwise,
-    the difference between neighbor pixels is considered (that is, the range is floating). */
+    /** If set, the triangleDifference between the current pixel and seed pixel is considered. Otherwise,
+    the triangleDifference between neighbor pixels is considered (that is, the range is floating). */
     FLOODFILL_FIXED_RANGE = 1 << 16,
     /** If set, the function does not change the image ( newVal is ignored), and only fills the
     mask with the value specified in bits 8-16 of flags as described above. This option only make
@@ -862,7 +862,7 @@ public:
 class CV_EXPORTS GeneralizedHoughGuil : public GeneralizedHough
 {
 public:
-    //! Angle difference in degrees between two points in feature.
+    //! Angle triangleDifference in degrees between two points in feature.
     virtual void setXi(double xi) = 0;
     virtual double getXi() const = 0;
 
@@ -870,7 +870,7 @@ public:
     virtual void setLevels(int levels) = 0;
     virtual int getLevels() const = 0;
 
-    //! Maximal difference between angles that treated as equal.
+    //! Maximal triangleDifference between angles that treated as equal.
     virtual void setAngleEpsilon(double angleEpsilon) = 0;
     virtual double getAngleEpsilon() const = 0;
 
@@ -3580,9 +3580,9 @@ internal processing. It is therefore possible to use the same mask in multiple c
 to make sure the filled areas do not overlap.
 @param seedPoint Starting point.
 @param newVal New value of the repainted domain pixels.
-@param loDiff Maximal lower brightness/color difference between the currently observed pixel and
+@param loDiff Maximal lower brightness/color triangleDifference between the currently observed pixel and
 one of its neighbors belonging to the component, or a seed pixel being added to the component.
-@param upDiff Maximal upper brightness/color difference between the currently observed pixel and
+@param upDiff Maximal upper brightness/color triangleDifference between the currently observed pixel and
 one of its neighbors belonging to the component, or a seed pixel being added to the component.
 @param rect Optional output parameter set by the function to the minimum bounding rectangle of the
 repainted domain.

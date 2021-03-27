@@ -123,7 +123,7 @@ cvRound( double value )
 # endif
 #else
     /* it's ok if round does not comply with IEEE754 standard;
-       the tests should allow +/-1 difference when the tested functions use round */
+       the tests should allow +/-1 triangleDifference when the tested functions use round */
     return (int)(value + (value >= 0 ? 0.5 : -0.5));
 #endif
 }
@@ -211,7 +211,7 @@ CV_INLINE int cvRound(float value)
 # endif
 #else
     /* it's ok if round does not comply with IEEE754 standard;
-     the tests should allow +/-1 difference when the tested functions use round */
+     the tests should allow +/-1 triangleDifference when the tested functions use round */
     return (int)(value + (value >= 0 ? 0.5f : -0.5f));
 #endif
 }

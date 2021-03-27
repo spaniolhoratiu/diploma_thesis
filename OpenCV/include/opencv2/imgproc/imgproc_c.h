@@ -865,7 +865,7 @@ CVAPI(void)  cvAdaptiveThreshold( const CvArr* src, CvArr* dst, double max_value
                                   int block_size CV_DEFAULT(3),
                                   double param1 CV_DEFAULT(5));
 
-/** @brief Fills the connected component until the color difference gets large enough
+/** @brief Fills the connected component until the color triangleDifference gets large enough
 @see cv::floodFill
 */
 CVAPI(void)  cvFloodFill( CvArr* image, CvPoint seed_point,

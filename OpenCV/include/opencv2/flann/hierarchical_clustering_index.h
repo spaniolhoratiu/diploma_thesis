@@ -273,7 +273,7 @@ private:
      * of a local aggregation. If it is, replace current candidate by this point. And so on...
      *
      * Used with KMeansIndex that computes centers coordinates by averaging positions of clusters points,
-     * this doesn't make a real difference with previous methods. But used with HierarchicalClusteringIndex
+     * this doesn't make a real triangleDifference with previous methods. But used with HierarchicalClusteringIndex
      * class that pick centers among existing points instead of computing the barycenters, there is a real
      * improvement.
      *

@@ -84,7 +84,7 @@ Haar-like features:
 The feature used in a particular classifier is specified by its shape (1a, 2b etc.), position within
 the region of interest and the scale (this scale is not the same as the scale used at the detection
 stage, though these two scales are multiplied). For example, in the case of the third line feature
-(2c) the response is calculated as the difference between the sum of image pixels under the
+(2c) the response is calculated as the triangleDifference between the sum of image pixels under the
 rectangle covering the whole feature (including the two white stripes and the black stripe in the
 middle) and the sum of the image pixels under the black stripe multiplied by 3 in order to
 compensate for the differences in the size of areas. The sums of pixel values over a rectangular
@@ -139,7 +139,7 @@ public:
 rectangles. (The Python list is not modified in place.)
 @param groupThreshold Minimum possible number of rectangles minus 1. The threshold is used in a
 group of rectangles to retain it.
-@param eps Relative difference between sides of the rectangles to merge them into a group.
+@param eps Relative triangleDifference between sides of the rectangles to merge them into a group.
 
 The function is a wrapper for the generic function partition . It clusters all the input rectangles
 using the rectangle equivalence criteria that combines rectangles with similar sizes and similar
@@ -665,7 +665,7 @@ public:
     @param rectList  Input/output vector of rectangles. Output vector includes retained and grouped rectangles. (The Python list is not modified in place.)
     @param weights Input/output vector of weights of rectangles. Output vector includes weights of retained and grouped rectangles. (The Python list is not modified in place.)
     @param groupThreshold Minimum possible number of rectangles minus 1. The threshold is used in a group of rectangles to retain it.
-    @param eps Relative difference between sides of the rectangles to merge them into a group.
+    @param eps Relative triangleDifference between sides of the rectangles to merge them into a group.
     */
     void groupRectangles(std::vector<cv::Rect>& rectList, std::vector<double>& weights, int groupThreshold, double eps) const;
 };
