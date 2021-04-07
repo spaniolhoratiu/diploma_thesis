@@ -6439,7 +6439,7 @@ struct DetectionVisual {
 	}
 };
 
-void thesis_testOnSingularInputImage_withAllConstellations_withLines_limitInputStars()
+void thesis_detectionOnInputImage_withAllConstellations_withLines_limitInputStars()
 {
 	const int BINARIZATION_THRESHOLD = 25;
 	const int NUMBER_OF_CONSTELLATIONS = 89;
@@ -6844,6 +6844,856 @@ void thesis_testOnSingularInputImage_withAllConstellations_withLines_limitInputS
 	}
 }
 
+void thesis_detectionOnInputImageFromParameters_withAllConstellations_withLines_limitInputStars()
+{
+	const int BINARIZATION_THRESHOLD = 25;
+	const int NUMBER_OF_CONSTELLATIONS = 89;
+	const double DEGENERATE_THRESHOLD = 0.05;
+	const int UPPER_LIMIT_INPUT_STARS = 20;
+	const int GLOBAL_CENTER_OF_MASS_AREA_THRESHOLD = 2;
+	const int METHOD_GREATER_LUMINOSITY = 0;
+	const int METHOD_LOWEST_DIFFERENCE = 1;
+	const int METHOD_ANY = 2;
+
+	const int TARGET_CONSTELLATION = 25;
+	const int TARGET_IMAGE = 4;
+
+	int correctConstellationsDetected = 0;
+	int incorrectConstellationsDetected = 0;
+
+	double params_triangDiffThresh[NUMBER_OF_CONSTELLATIONS];
+	int params_areaThresh[NUMBER_OF_CONSTELLATIONS];
+	int params_posVar[NUMBER_OF_CONSTELLATIONS];
+	double params_lum[NUMBER_OF_CONSTELLATIONS];
+	int params_methodsMultDetect[NUMBER_OF_CONSTELLATIONS];
+
+	char detectionParamsFileName[250];
+	sprintf(detectionParamsFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//detection_parameters_constellations.txt");
+	FILE* detectionParamsFp = fopen(detectionParamsFileName, "r");
+	if (detectionParamsFp == NULL)
+	{
+		printf("Could not open detection params file.\n");
+	}
+	else
+	{
+		for (int i = 0; i < NUMBER_OF_CONSTELLATIONS; i++)
+		{
+			fscanf(detectionParamsFp, "%*d,%lf,%d,%d,%lf,%d", // %*d = value read is not stored
+				&params_triangDiffThresh[i],
+				&params_areaThresh[i],
+				&params_posVar[i],
+				&params_lum[i],
+				&params_methodsMultDetect[i]);
+		}
+
+		char inputFileName[MAX_PATH];
+		sprintf(inputFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//evaluation_images//%d//%d.png", TARGET_CONSTELLATION, TARGET_IMAGE);
+
+		clock_t startTime, endTime;
+		startTime = clock();
+
+		Mat src = imread(inputFileName, IMREAD_GRAYSCALE);
+		imshow("Source grayscale", src);
+
+		// TODO: Consider other threshold methods
+		Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
+		char buffer[50];
+		sprintf(buffer, "Thresholded at %d", BINARIZATION_THRESHOLD);
+		imshow(buffer, thresholdedImage);
+
+		Mat labels = computeLabelsMatrixBFS(thresholdedImage);
+		Mat labeledImage = computeLabeledImage(labels);
+		imshow("Labeled", labeledImage);
+
+		std::vector<Vec3b> colorsOfObjects = computeObjectsColorsBlackBackground(labeledImage);
+
+		CenterOfMassInformation centerOfMassInformationGlobal = computeCentersOfMass(labeledImage, colorsOfObjects, GLOBAL_CENTER_OF_MASS_AREA_THRESHOLD);
+		//imshow("Centers of mass", centerOfMassInformation.image);
+		sort(centerOfMassInformationGlobal.stars.begin(), centerOfMassInformationGlobal.stars.end());
+
+		int limitNumberOfBrightestStars = UPPER_LIMIT_INPUT_STARS > centerOfMassInformationGlobal.stars.size() ?
+			centerOfMassInformationGlobal.stars.size() :
+			UPPER_LIMIT_INPUT_STARS;
+
+		std::vector<Point> inputPoints;
+		for (int i = 0; i < limitNumberOfBrightestStars; i++)
+		{
+			inputPoints.push_back(centerOfMassInformationGlobal.stars.at(i).position);
+		}
+		inputCombinations.clear();
+		generateCombinationsInput(0, 3, inputPoints);
+
+		std::vector<Triangle> inputTriangles;
+		for (int i = 0; i < inputCombinations.size(); i++)
+		{
+			Triangle triangle;
+			triangle.points = inputCombinations[i];
+			triangle.computeDistances();
+			double smallest2DistancesSum = triangle.distances.at(0).value + triangle.distances.at(1).value;
+			if (smallest2DistancesSum < triangle.distances.at(2).value - DEGENERATE_THRESHOLD ||
+				smallest2DistancesSum > triangle.distances.at(2).value + DEGENERATE_THRESHOLD
+				)
+			{
+				inputTriangles.push_back(triangle);
+			}
+		}
+
+		std::vector<DetectionVisual> detectionVisuals;
+		int matchesOnConstellations[NUMBER_OF_CONSTELLATIONS] = { 0 };
+		omp_lock_t lock;
+		omp_init_lock(&lock);
+
+		omp_set_num_threads(NUMBER_OF_CONSTELLATIONS);
+		#pragma omp parallel for
+		for (int currentConstellationNumber = 0; currentConstellationNumber < NUMBER_OF_CONSTELLATIONS; currentConstellationNumber++)
+		{
+			if (params_methodsMultDetect[currentConstellationNumber] == -1) continue;
+
+			int currentIterationMatches = 0;
+
+			//printf("\nInput image\nPoints:%d\nTriangles:%d\n",
+			//	inputPoints.size(),
+			//	inputTriangles.size());
+
+			std::vector<std::vector<Point>> matchingSrcPoints; // All sets of matched points found in source image
+			std::vector<Detection> allDetections;
+
+			char fileName[250];
+			if (currentConstellationNumber < 10)
+				sprintf(fileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//constellation0%d_data.txt", currentConstellationNumber);
+			else
+				sprintf(fileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//constellation%d_data.txt", currentConstellationNumber);
+
+			std::vector<Point> constellationPoints;
+			std::vector<Triangle> constellationTriangles;
+			std::vector<std::vector<int>> constellationLines;
+			char constellationName[250];
+
+			FILE* fp;
+			fp = fopen(fileName, "r");
+			if (fp != NULL)
+			{
+				// Read constellation file
+				int nbOfPoints, nbOfLines, nbOfTriangles;
+				fscanf(fp, "%s %d %d %d", &constellationName, &nbOfPoints, &nbOfLines, &nbOfTriangles);
+
+				//printf("\nConstellation %d\nPoints: %d\nLines: %d\nTriangles: %d\n",
+				//	currentConstellationNumber,
+				//	nbOfPoints,
+				//	nbOfLines,
+				//	nbOfTriangles);
+
+				for (int i = 0; i < nbOfPoints; i++)
+				{
+					int x, y;
+					fscanf(fp, "%*d %d %d", &x, &y); // First integer not used; push_back keeps in the order wanted
+					constellationPoints.push_back(Point(x, y));
+				}
+
+				for (int i = 0; i < nbOfLines; i++)
+				{
+					int p1Index, p2Index;
+					fscanf(fp, "%d %d", &p1Index, &p2Index);
+					std::vector<int> aux = { p1Index, p2Index };
+					constellationLines.push_back(aux);
+				}
+
+				for (int i = 0; i < nbOfTriangles; i++)
+				{
+					Triangle currentTriangle;
+					int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
+					double d1, d2, d3;
+					fscanf(fp, "%d %d %d %d %lf %d %d %d %d %lf %d %d %d %d %lf",
+						&x1, &y1, &x2, &y2, &d1,
+						&x3, &y3, &x4, &y4, &d2,
+						&x5, &y5, &x6, &y6, &d3);
+
+					// TODO: adding these points MIGHT be redundant 
+					currentTriangle.points.push_back(Point(x1, y1));
+					currentTriangle.points.push_back(Point(x3, y3));
+					currentTriangle.points.push_back(Point(x5, y5));
+
+					Distance distance1(Point(x1, y1), Point(x2, y2), d1);
+					Distance distance2(Point(x3, y3), Point(x4, y4), d2);
+					Distance distance3(Point(x5, y5), Point(x6, y6), d3);
+
+					currentTriangle.distances.push_back(distance1);
+					currentTriangle.distances.push_back(distance2);
+					currentTriangle.distances.push_back(distance3);
+
+					double smallest2DistancesSum = distance1.value + distance2.value;
+					if (smallest2DistancesSum < distance3.value - DEGENERATE_THRESHOLD ||	 // Filter degenerate constellation triangles
+						smallest2DistancesSum > distance3.value + DEGENERATE_THRESHOLD)
+					{
+						constellationTriangles.push_back(currentTriangle);
+					}
+				}
+				fclose(fp);
+
+				// Brute force comparison between source and constellation triangles
+				// TODO: Parallelize the comparison ?
+				//omp_set_num_threads(inputTriangles.size());
+				//#pragma omp parallel for collapse(2)
+				std::vector<MatchingTrianglePair> allPairs;
+				for (int i = 0; i < inputTriangles.size(); i++)
+				{
+					for (int j = 0; j < constellationTriangles.size(); j++)
+					{
+						MatchingTrianglePair currentPair(inputTriangles[i], constellationTriangles[j]);
+						if (currentPair.triangleDifference < params_triangDiffThresh[currentConstellationNumber])
+						{
+							allPairs.push_back(currentPair);
+						}
+					}
+				}
+
+				for (int i = 0; i < allPairs.size(); i++)
+				{
+					MatchingTrianglePair currentPair = allPairs[i];
+
+					Point2f srcTri[3];
+					srcTri[0] = Point2f(currentPair.constellationTriangle.points[0].x, currentPair.constellationTriangle.points[0].y);
+					srcTri[1] = Point2f(currentPair.constellationTriangle.points[1].x, currentPair.constellationTriangle.points[1].y);
+					srcTri[2] = Point2f(currentPair.constellationTriangle.points[2].x, currentPair.constellationTriangle.points[2].y);
+					Point2f dstTri[3];
+					dstTri[0] = Point2f(currentPair.inputTriangle.points[0].x, currentPair.inputTriangle.points[0].y);
+					dstTri[1] = Point2f(currentPair.inputTriangle.points[1].x, currentPair.inputTriangle.points[1].y);
+					dstTri[2] = Point2f(currentPair.inputTriangle.points[2].x, currentPair.inputTriangle.points[2].y);
+
+					Mat warp_mat = getAffineTransform(srcTri, dstTri);
+
+					// Warp constellation
+					std::vector<Point2f> warpedConstellationPoints;
+					for (int j = 0; j < constellationPoints.size(); j++)
+					{
+						Point2f nonWarpedPoint(constellationPoints[j].x, constellationPoints[j].y);
+						Point2f warpedPoint;
+						warpedPoint.x = warp_mat.at<double>(0, 0) * nonWarpedPoint.x + warp_mat.at<double>(0, 1) * nonWarpedPoint.y + warp_mat.at<double>(0, 2);
+						warpedPoint.y = warp_mat.at<double>(1, 0) * nonWarpedPoint.x + warp_mat.at<double>(1, 1) * nonWarpedPoint.y + warp_mat.at<double>(1, 2);
+						warpedConstellationPoints.push_back(warpedPoint);
+					}
+
+
+					std::vector<Point> srcMatchingPointsCurrent; // All points matched in the source image for current pair of triangles
+					std::vector<int> matchedIndexes;
+					double meanLuminosity = 0.0f;
+					for (int j = 0; j < warpedConstellationPoints.size(); j++)
+					{
+						Point2f currentPoint = warpedConstellationPoints[j];
+						int yOfPoint = (int)(currentPoint.y + 0.5f); // Float -> int : add 0.5 then (int)
+						int xOfPoint = (int)(currentPoint.x + 0.5f);
+						if (yOfPoint > centerOfMassInformationGlobal.image.rows || yOfPoint < 0) break; // Check out of bounds
+						if (xOfPoint > centerOfMassInformationGlobal.image.cols || xOfPoint < 0) break;	// Check out of bounds
+
+						bool brokeInnerLoop = false;
+						for (int index0 = 0; index0 <= params_posVar[currentConstellationNumber]; index0++)
+						{
+							for (int index1 = (-1 * index0); index1 <= index0; index1++)
+							{
+								for (int index2 = (-1 * index0); index2 <= index0; index2++)
+								{
+									/*	int yOfPointCurrent = yOfPoint + index1;
+										int xOfPointCurrent = xOfPoint + index2;*/
+									Point movedPoint(xOfPoint + index2, yOfPoint + index1);
+
+									if (movedPoint.y > (centerOfMassInformationGlobal.image.rows - 1) // Check out of bounds
+										|| movedPoint.y < 0
+										|| movedPoint.x >(centerOfMassInformationGlobal.image.cols - 1)
+										|| movedPoint.x < 0
+										)
+									{
+										brokeInnerLoop = true;
+										break;
+									}
+									if (centerOfMassInformationGlobal.image.at<uchar>(movedPoint.y, movedPoint.x) == WHITE)
+									{
+										if (centerOfMassInformationGlobal.areasMat.at<int>(movedPoint.y, movedPoint.x) > params_areaThresh[currentConstellationNumber])
+										{
+											if (std::find(srcMatchingPointsCurrent.begin(), srcMatchingPointsCurrent.end(), movedPoint) == srcMatchingPointsCurrent.end())
+											{
+												srcMatchingPointsCurrent.push_back(movedPoint);
+												matchedIndexes.push_back(j);
+												meanLuminosity += centerOfMassInformationGlobal.areasMat.at<int>(movedPoint.y, movedPoint.x);
+												brokeInnerLoop = true;
+												break;
+											}
+										}
+									}
+								}
+								if (brokeInnerLoop) break;
+							}
+							if (brokeInnerLoop) break;
+						}
+					}
+
+					if (srcMatchingPointsCurrent.size() == constellationPoints.size())
+					{
+						meanLuminosity /= srcMatchingPointsCurrent.size();
+
+						if (meanLuminosity > params_lum[currentConstellationNumber])
+						{
+							if (std::find(matchingSrcPoints.begin(), matchingSrcPoints.end(), srcMatchingPointsCurrent) == matchingSrcPoints.end())
+							{
+								currentIterationMatches++;
+								matchingSrcPoints.push_back(srcMatchingPointsCurrent);
+								Detection detection(srcMatchingPointsCurrent, currentPair, meanLuminosity, params_methodsMultDetect[currentConstellationNumber], matchedIndexes);
+								allDetections.push_back(detection);
+							}
+						}
+					}
+				}
+			}
+
+
+			if (allDetections.size() > 0)
+			{
+				//for (int j = 0; j < allDetections.size(); j++)
+				//{
+				//	printf("Detection %d Order=%d Lum=%lf Diff=%lf\n", j, allDetections[j].sortingOrder, allDetections[j].luminosity, allDetections[j].triangleDifference);
+				//}
+				//printf("Number of detections: %d\n", allDetections.size());
+
+				sort(allDetections.begin(), allDetections.end());
+				Detection selectedDetection = allDetections[0];
+				printf("\nDetection of constellation %d\nNb. of points:%d\nDifference:%lf\nLuminosity:%lf\n",
+					currentConstellationNumber,
+					selectedDetection.srcPoints.size(),
+					selectedDetection.triangleDifference,
+					selectedDetection.luminosity
+				);
+
+				Mat inputHighlightedImage = imread(inputFileName, IMREAD_COLOR);
+				char constellationImageFileName[250];
+				if (currentConstellationNumber < 10)
+					sprintf(constellationImageFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations//png//constellation0%d.png", currentConstellationNumber);
+				else
+					sprintf(constellationImageFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations//png//constellation%d.png", currentConstellationNumber);
+				Mat constellationHighlightedImage = imread(constellationImageFileName, IMREAD_COLOR);
+
+				// Drawing matching triangles
+				line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[0], selectedDetection.trianglePair.inputTriangle.points[1], Vec3b(255, 0, 0), 1);
+				line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[0], selectedDetection.trianglePair.inputTriangle.points[2], Vec3b(0, 255, 0), 1);
+				line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[1], selectedDetection.trianglePair.inputTriangle.points[2], Vec3b(0, 0, 255), 1);
+
+				line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[0], selectedDetection.trianglePair.constellationTriangle.points[1], Vec3b(255, 0, 0), 1);
+				line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[0], selectedDetection.trianglePair.constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
+				line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[1], selectedDetection.trianglePair.constellationTriangle.points[2], Vec3b(0, 0, 255), 1);
+
+				// Drawing points of warped constellation on input image
+				for (Point point : selectedDetection.srcPoints)
+				{
+					circle(inputHighlightedImage, point, 2, Vec3b(0, 0, 255), 3);
+				}
+
+				// Draw lines of warped constellation on input image
+				for (int j = 0; j < constellationLines.size(); j++)
+				{
+					std::vector<int> currentLine = constellationLines[j];
+					line(inputHighlightedImage,
+						selectedDetection.srcPoints.at(selectedDetection.matchedIndexes.at(currentLine[0])),
+						selectedDetection.srcPoints.at(selectedDetection.matchedIndexes.at(currentLine[1])),
+						Vec3b(255, 255, 0), 1);
+				}
+
+				// Draw name of warped constellation on input image
+				putText(inputHighlightedImage,
+					constellationName,
+					cv::Point(5, inputHighlightedImage.rows - 5),
+					cv::FONT_HERSHEY_DUPLEX,
+					1.0,
+					CV_RGB(255, 255, 255),
+					1);
+
+
+				DetectionVisual detectionVisual(inputHighlightedImage, constellationHighlightedImage, currentConstellationNumber);
+
+				omp_set_lock(&lock);
+				detectionVisuals.push_back(detectionVisual);
+				omp_unset_lock(&lock);
+			}
+
+
+			if (currentIterationMatches > 0)
+			{
+				omp_set_lock(&lock);
+				matchesOnConstellations[currentConstellationNumber] = currentIterationMatches;
+				omp_unset_lock(&lock);
+			}
+		}
+
+		for (int i = 0; i < detectionVisuals.size(); i++)
+		{
+			char bufferInputImage[100];
+			sprintf(bufferInputImage, "inputHighlighted %d", detectionVisuals[i].number);
+			imshow(bufferInputImage, detectionVisuals[i].inputImage);
+
+			char bufferConstellationImage[100];
+			sprintf(bufferConstellationImage, "constellationHighlighted %d", detectionVisuals[i].number);
+			imshow(bufferConstellationImage, detectionVisuals[i].constellationImage);
+		}
+
+		endTime = clock();
+		double timeTaken = double(endTime - startTime) / double(CLOCKS_PER_SEC);
+
+		printf("\n\n\n ----- Stats ----- \n\n\n");
+		printf("Time: %lf seconds.\n", timeTaken);
+		for (int i = 0; i < NUMBER_OF_CONSTELLATIONS; i++)
+		{
+			if (matchesOnConstellations[i] > 0)
+			{
+				if (matchesOnConstellations[i] == 1)
+				{
+					printf("Constellation %d: %d match.\n", i, matchesOnConstellations[i]);
+				}
+				else
+				{
+					printf("Constellation %d: %d matches.\n", i, matchesOnConstellations[i]);
+				}
+				if (i == TARGET_CONSTELLATION)
+				{
+					correctConstellationsDetected++;
+				}
+				else
+				{
+					incorrectConstellationsDetected++;
+				}
+			}
+		}
+
+		printf("\n\nCorrect constellations: %d \n", correctConstellationsDetected);
+		printf("Incorrect constellations: %d \n", incorrectConstellationsDetected);
+
+		
+		waitKey(0);
+	}
+}
+
+void thesis_paramsEvaluationOnFolder_withAllConstellations_withLines_limitInputStars()
+{
+	const int BINARIZATION_THRESHOLD = 25;
+	const int NUMBER_OF_CONSTELLATIONS = 89;
+	const double DEGENERATE_THRESHOLD = 0.05;
+	const int UPPER_LIMIT_INPUT_STARS = 20;
+	const int GLOBAL_CENTER_OF_MASS_AREA_THRESHOLD = 2;
+	const int METHOD_GREATER_LUMINOSITY = 0;
+	const int METHOD_LOWEST_DIFFERENCE = 1;
+	const int METHOD_ANY = 2;
+
+	double params_triangDiffThresh[NUMBER_OF_CONSTELLATIONS];
+	int params_areaThresh[NUMBER_OF_CONSTELLATIONS];
+	int params_posVar[NUMBER_OF_CONSTELLATIONS];
+	double params_lum[NUMBER_OF_CONSTELLATIONS];
+	int params_methodsMultDetect[NUMBER_OF_CONSTELLATIONS];
+
+	const int TARGET_CONSTELLATION = 25;
+	const int IMAGES_IN_FOLDER = 10;
+	int correctDetections = 0;
+	int falseDetections = 0;
+
+	char detectionParamsFileName[250];
+	sprintf(detectionParamsFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//detection_parameters_constellations.txt");
+	FILE* detectionParamsFp = fopen(detectionParamsFileName, "r");
+	if (detectionParamsFp == NULL)
+	{
+		printf("Could not open detection params file.\n");
+	}
+	else
+	{
+		for (int i = 0; i < NUMBER_OF_CONSTELLATIONS; i++)
+		{
+			fscanf(detectionParamsFp, "%*d,%lf,%d,%d,%lf,%d", // %*d = value read is not stored
+				&params_triangDiffThresh[i],
+				&params_areaThresh[i],
+				&params_posVar[i],
+				&params_lum[i],
+				&params_methodsMultDetect[i]);
+		}
+
+		char inputFileName[MAX_PATH];
+
+		for (int imageIndex = 1; imageIndex <= IMAGES_IN_FOLDER; imageIndex++)
+		{
+		
+			clock_t startTime, endTime;
+			startTime = clock();
+
+			sprintf(inputFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//evaluation_images//%d//%d.png", TARGET_CONSTELLATION, imageIndex);
+			Mat src = imread(inputFileName, IMREAD_GRAYSCALE);
+			//imshow("Source grayscale", src);
+
+			// TODO: Consider other threshold methods
+			Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
+			//char buffer[50];
+			//sprintf(buffer, "Thresholded at %d", BINARIZATION_THRESHOLD);
+			//imshow(buffer, thresholdedImage);
+
+			Mat labels = computeLabelsMatrixBFS(thresholdedImage);
+			Mat labeledImage = computeLabeledImage(labels);
+			//imshow("Labeled", labeledImage);
+
+			std::vector<Vec3b> colorsOfObjects = computeObjectsColorsBlackBackground(labeledImage);
+
+			CenterOfMassInformation centerOfMassInformationGlobal = computeCentersOfMass(labeledImage, colorsOfObjects, GLOBAL_CENTER_OF_MASS_AREA_THRESHOLD);
+			//imshow("Centers of mass", centerOfMassInformation.image);
+			sort(centerOfMassInformationGlobal.stars.begin(), centerOfMassInformationGlobal.stars.end());
+
+			int limitNumberOfBrightestStars = UPPER_LIMIT_INPUT_STARS > centerOfMassInformationGlobal.stars.size() ?
+				centerOfMassInformationGlobal.stars.size() :
+				UPPER_LIMIT_INPUT_STARS;
+
+			std::vector<Point> inputPoints;
+			for (int i = 0; i < limitNumberOfBrightestStars; i++)
+			{
+				inputPoints.push_back(centerOfMassInformationGlobal.stars.at(i).position);
+			}
+			inputCombinations.clear();
+			generateCombinationsInput(0, 3, inputPoints);
+
+			std::vector<Triangle> inputTriangles;
+			for (int i = 0; i < inputCombinations.size(); i++)
+			{
+				Triangle triangle;
+				triangle.points = inputCombinations[i];
+				triangle.computeDistances();
+				double smallest2DistancesSum = triangle.distances.at(0).value + triangle.distances.at(1).value;
+				if (smallest2DistancesSum < triangle.distances.at(2).value - DEGENERATE_THRESHOLD ||
+					smallest2DistancesSum > triangle.distances.at(2).value + DEGENERATE_THRESHOLD
+					)
+				{
+					inputTriangles.push_back(triangle);
+				}
+			}
+
+			std::vector<DetectionVisual> detectionVisuals;
+			int matchesOnConstellations[NUMBER_OF_CONSTELLATIONS] = { 0 };
+			omp_lock_t lock;
+			omp_init_lock(&lock);
+
+			omp_set_num_threads(NUMBER_OF_CONSTELLATIONS);
+			#pragma omp parallel for
+			for (int currentConstellationNumber = 0; currentConstellationNumber < NUMBER_OF_CONSTELLATIONS; currentConstellationNumber++)
+			{
+				if (params_methodsMultDetect[currentConstellationNumber] == -1) continue;
+
+				int currentIterationMatches = 0;
+
+				//printf("\nInput image\nPoints:%d\nTriangles:%d\n",
+				//	inputPoints.size(),
+				//	inputTriangles.size());
+
+				std::vector<std::vector<Point>> matchingSrcPoints; // All sets of matched points found in source image
+				std::vector<Detection> allDetections;
+
+				char fileName[250];
+				if (currentConstellationNumber < 10)
+					sprintf(fileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//constellation0%d_data.txt", currentConstellationNumber);
+				else
+					sprintf(fileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations_processing_data//constellation%d_data.txt", currentConstellationNumber);
+
+				std::vector<Point> constellationPoints;
+				std::vector<Triangle> constellationTriangles;
+				std::vector<std::vector<int>> constellationLines;
+				char constellationName[250];
+
+				FILE* fp;
+				fp = fopen(fileName, "r");
+				if (fp != NULL)
+				{
+					// Read constellation file
+					int nbOfPoints, nbOfLines, nbOfTriangles;
+					fscanf(fp, "%s %d %d %d", &constellationName, &nbOfPoints, &nbOfLines, &nbOfTriangles);
+
+					//printf("\nConstellation %d\nPoints: %d\nLines: %d\nTriangles: %d\n",
+					//	currentConstellationNumber,
+					//	nbOfPoints,
+					//	nbOfLines,
+					//	nbOfTriangles);
+
+					for (int i = 0; i < nbOfPoints; i++)
+					{
+						int x, y;
+						fscanf(fp, "%*d %d %d", &x, &y); // First integer not used; push_back keeps in the order wanted
+						constellationPoints.push_back(Point(x, y));
+					}
+
+					for (int i = 0; i < nbOfLines; i++)
+					{
+						int p1Index, p2Index;
+						fscanf(fp, "%d %d", &p1Index, &p2Index);
+						std::vector<int> aux = { p1Index, p2Index };
+						constellationLines.push_back(aux);
+					}
+
+					for (int i = 0; i < nbOfTriangles; i++)
+					{
+						Triangle currentTriangle;
+						int x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
+						double d1, d2, d3;
+						fscanf(fp, "%d %d %d %d %lf %d %d %d %d %lf %d %d %d %d %lf",
+							&x1, &y1, &x2, &y2, &d1,
+							&x3, &y3, &x4, &y4, &d2,
+							&x5, &y5, &x6, &y6, &d3);
+
+						// TODO: adding these points MIGHT be redundant 
+						currentTriangle.points.push_back(Point(x1, y1));
+						currentTriangle.points.push_back(Point(x3, y3));
+						currentTriangle.points.push_back(Point(x5, y5));
+
+						Distance distance1(Point(x1, y1), Point(x2, y2), d1);
+						Distance distance2(Point(x3, y3), Point(x4, y4), d2);
+						Distance distance3(Point(x5, y5), Point(x6, y6), d3);
+
+						currentTriangle.distances.push_back(distance1);
+						currentTriangle.distances.push_back(distance2);
+						currentTriangle.distances.push_back(distance3);
+
+						double smallest2DistancesSum = distance1.value + distance2.value;
+						if (smallest2DistancesSum < distance3.value - DEGENERATE_THRESHOLD ||	 // Filter degenerate constellation triangles
+							smallest2DistancesSum > distance3.value + DEGENERATE_THRESHOLD)
+						{
+							constellationTriangles.push_back(currentTriangle);
+						}
+					}
+					fclose(fp);
+
+					// Brute force comparison between source and constellation triangles
+					// TODO: Parallelize the comparison ?
+					//omp_set_num_threads(inputTriangles.size());
+					//#pragma omp parallel for collapse(2)
+					std::vector<MatchingTrianglePair> allPairs;
+					for (int i = 0; i < inputTriangles.size(); i++)
+					{
+						for (int j = 0; j < constellationTriangles.size(); j++)
+						{
+							MatchingTrianglePair currentPair(inputTriangles[i], constellationTriangles[j]);
+							if (currentPair.triangleDifference < params_triangDiffThresh[currentConstellationNumber])
+							{
+								allPairs.push_back(currentPair);
+							}
+						}
+					}
+
+					for (int i = 0; i < allPairs.size(); i++)
+					{
+						MatchingTrianglePair currentPair = allPairs[i];
+
+						Point2f srcTri[3];
+						srcTri[0] = Point2f(currentPair.constellationTriangle.points[0].x, currentPair.constellationTriangle.points[0].y);
+						srcTri[1] = Point2f(currentPair.constellationTriangle.points[1].x, currentPair.constellationTriangle.points[1].y);
+						srcTri[2] = Point2f(currentPair.constellationTriangle.points[2].x, currentPair.constellationTriangle.points[2].y);
+						Point2f dstTri[3];
+						dstTri[0] = Point2f(currentPair.inputTriangle.points[0].x, currentPair.inputTriangle.points[0].y);
+						dstTri[1] = Point2f(currentPair.inputTriangle.points[1].x, currentPair.inputTriangle.points[1].y);
+						dstTri[2] = Point2f(currentPair.inputTriangle.points[2].x, currentPair.inputTriangle.points[2].y);
+
+						Mat warp_mat = getAffineTransform(srcTri, dstTri);
+
+						// Warp constellation
+						std::vector<Point2f> warpedConstellationPoints;
+						for (int j = 0; j < constellationPoints.size(); j++)
+						{
+							Point2f nonWarpedPoint(constellationPoints[j].x, constellationPoints[j].y);
+							Point2f warpedPoint;
+							warpedPoint.x = warp_mat.at<double>(0, 0) * nonWarpedPoint.x + warp_mat.at<double>(0, 1) * nonWarpedPoint.y + warp_mat.at<double>(0, 2);
+							warpedPoint.y = warp_mat.at<double>(1, 0) * nonWarpedPoint.x + warp_mat.at<double>(1, 1) * nonWarpedPoint.y + warp_mat.at<double>(1, 2);
+							warpedConstellationPoints.push_back(warpedPoint);
+						}
+
+
+						std::vector<Point> srcMatchingPointsCurrent; // All points matched in the source image for current pair of triangles
+						std::vector<int> matchedIndexes;
+						double meanLuminosity = 0.0f;
+						for (int j = 0; j < warpedConstellationPoints.size(); j++)
+						{
+							Point2f currentPoint = warpedConstellationPoints[j];
+							int yOfPoint = (int)(currentPoint.y + 0.5f); // Float -> int : add 0.5 then (int)
+							int xOfPoint = (int)(currentPoint.x + 0.5f);
+							if (yOfPoint > centerOfMassInformationGlobal.image.rows || yOfPoint < 0) break; // Check out of bounds
+							if (xOfPoint > centerOfMassInformationGlobal.image.cols || xOfPoint < 0) break;	// Check out of bounds
+
+							bool brokeInnerLoop = false;
+							for (int index0 = 0; index0 <= params_posVar[currentConstellationNumber]; index0++)
+							{
+								for (int index1 = (-1 * index0); index1 <= index0; index1++)
+								{
+									for (int index2 = (-1 * index0); index2 <= index0; index2++)
+									{
+										/*	int yOfPointCurrent = yOfPoint + index1;
+											int xOfPointCurrent = xOfPoint + index2;*/
+										Point movedPoint(xOfPoint + index2, yOfPoint + index1);
+
+										if (movedPoint.y > (centerOfMassInformationGlobal.image.rows - 1) // Check out of bounds
+											|| movedPoint.y < 0
+											|| movedPoint.x >(centerOfMassInformationGlobal.image.cols - 1)
+											|| movedPoint.x < 0
+											)
+										{
+											brokeInnerLoop = true;
+											break;
+										}
+										if (centerOfMassInformationGlobal.image.at<uchar>(movedPoint.y, movedPoint.x) == WHITE)
+										{
+											if (centerOfMassInformationGlobal.areasMat.at<int>(movedPoint.y, movedPoint.x) > params_areaThresh[currentConstellationNumber])
+											{
+												if (std::find(srcMatchingPointsCurrent.begin(), srcMatchingPointsCurrent.end(), movedPoint) == srcMatchingPointsCurrent.end())
+												{
+													srcMatchingPointsCurrent.push_back(movedPoint);
+													matchedIndexes.push_back(j);
+													meanLuminosity += centerOfMassInformationGlobal.areasMat.at<int>(movedPoint.y, movedPoint.x);
+													brokeInnerLoop = true;
+													break;
+												}
+											}
+										}
+									}
+									if (brokeInnerLoop) break;
+								}
+								if (brokeInnerLoop) break;
+							}
+						}
+
+						if (srcMatchingPointsCurrent.size() == constellationPoints.size())
+						{
+							meanLuminosity /= srcMatchingPointsCurrent.size();
+
+							if (meanLuminosity > params_lum[currentConstellationNumber])
+							{
+								if (std::find(matchingSrcPoints.begin(), matchingSrcPoints.end(), srcMatchingPointsCurrent) == matchingSrcPoints.end())
+								{
+									currentIterationMatches++;
+									matchingSrcPoints.push_back(srcMatchingPointsCurrent);
+									Detection detection(srcMatchingPointsCurrent, currentPair, meanLuminosity, params_methodsMultDetect[currentConstellationNumber], matchedIndexes);
+									allDetections.push_back(detection);
+								}
+							}
+						}
+					}
+				}
+
+
+				if (allDetections.size() > 0)
+				{
+					//for (int j = 0; j < allDetections.size(); j++)
+					//{
+					//	printf("Detection %d Order=%d Lum=%lf Diff=%lf\n", j, allDetections[j].sortingOrder, allDetections[j].luminosity, allDetections[j].triangleDifference);
+					//}
+					//printf("Number of detections: %d\n", allDetections.size());
+
+					sort(allDetections.begin(), allDetections.end());
+					Detection selectedDetection = allDetections[0];
+					printf("\nDetection of constellation %d\nNb. of points:%d\nDifference:%lf\nLuminosity:%lf\n",
+						currentConstellationNumber,
+						selectedDetection.srcPoints.size(),
+						selectedDetection.triangleDifference,
+						selectedDetection.luminosity
+					);
+
+					Mat inputHighlightedImage = imread(inputFileName, IMREAD_COLOR);
+					char constellationImageFileName[250];
+					if (currentConstellationNumber < 10)
+						sprintf(constellationImageFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations//png//constellation0%d.png", currentConstellationNumber);
+					else
+						sprintf(constellationImageFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations//png//constellation%d.png", currentConstellationNumber);
+					Mat constellationHighlightedImage = imread(constellationImageFileName, IMREAD_COLOR);
+
+					// Drawing matching triangles
+					line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[0], selectedDetection.trianglePair.inputTriangle.points[1], Vec3b(255, 0, 0), 1);
+					line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[0], selectedDetection.trianglePair.inputTriangle.points[2], Vec3b(0, 255, 0), 1);
+					line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[1], selectedDetection.trianglePair.inputTriangle.points[2], Vec3b(0, 0, 255), 1);
+
+					line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[0], selectedDetection.trianglePair.constellationTriangle.points[1], Vec3b(255, 0, 0), 1);
+					line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[0], selectedDetection.trianglePair.constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
+					line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[1], selectedDetection.trianglePair.constellationTriangle.points[2], Vec3b(0, 0, 255), 1);
+
+					// Drawing points of warped constellation on input image
+					for (Point point : selectedDetection.srcPoints)
+					{
+						circle(inputHighlightedImage, point, 2, Vec3b(0, 0, 255), 3);
+					}
+
+					// Draw lines of warped constellation on input image
+					for (int j = 0; j < constellationLines.size(); j++)
+					{
+						std::vector<int> currentLine = constellationLines[j];
+						line(inputHighlightedImage,
+							selectedDetection.srcPoints.at(selectedDetection.matchedIndexes.at(currentLine[0])),
+							selectedDetection.srcPoints.at(selectedDetection.matchedIndexes.at(currentLine[1])),
+							Vec3b(255, 255, 0), 1);
+					}
+
+					// Draw name of warped constellation on input image
+					putText(inputHighlightedImage,
+						constellationName,
+						cv::Point(5, inputHighlightedImage.rows - 5),
+						cv::FONT_HERSHEY_DUPLEX,
+						1.0,
+						CV_RGB(255, 255, 255),
+						1);
+
+
+					DetectionVisual detectionVisual(inputHighlightedImage, constellationHighlightedImage, currentConstellationNumber);
+
+					omp_set_lock(&lock);
+					detectionVisuals.push_back(detectionVisual);
+					omp_unset_lock(&lock);
+				}
+
+
+				if (currentIterationMatches > 0)
+				{
+					omp_set_lock(&lock);
+					matchesOnConstellations[currentConstellationNumber] = currentIterationMatches;
+					omp_unset_lock(&lock);
+				}
+			}
+
+			for (int i = 0; i < detectionVisuals.size(); i++)
+			{
+				char bufferInputImage[100];
+				sprintf(bufferInputImage, "%d inputHighlighted %d", imageIndex, detectionVisuals[i].number);
+				imshow(bufferInputImage, detectionVisuals[i].inputImage);
+
+				char bufferConstellationImage[100];
+				sprintf(bufferConstellationImage, "%d constellationHighlighted %d", imageIndex, detectionVisuals[i].number);
+				//imshow(bufferConstellationImage, detectionVisuals[i].constellationImage);
+			}
+
+			endTime = clock();
+			double timeTaken = double(endTime - startTime) / double(CLOCKS_PER_SEC);
+
+			//printf("\n\n\n ----- Stats ----- \n\n\n");
+			//printf("Time: %lf seconds.\n", timeTaken);
+			for (int i = 0; i < NUMBER_OF_CONSTELLATIONS; i++)
+			{
+				if (matchesOnConstellations[i] > 0)
+				{
+					//if (matchesOnConstellations[i] == 1)
+					//{
+					//	printf("Constellation %d: %d match.\n", i, matchesOnConstellations[i]);
+					//}
+					//else
+					//{
+					//	printf("Constellation %d: %d matches.\n", i, matchesOnConstellations[i]);
+					//}
+					if (i == TARGET_CONSTELLATION)
+					{
+						correctDetections++;
+					}
+					else
+					{
+						falseDetections++;
+					}
+				}
+			}
+
+			
+		}
+
+		printf("\n\nCorrect detections: %d\n", correctDetections);
+		printf("False detections: %d\n", falseDetections);
+		waitKey(0);
+	}
+}
 
 void thesis_testOnSingularInputImage_withAllConstellations_withLines()
 {
@@ -8735,7 +9585,13 @@ int main()
 				thesis_testOnSingularInputImageFromParameters_withAllConstellations_withLines();
 				break;
 			case 333:
-				thesis_testOnSingularInputImage_withAllConstellations_withLines_limitInputStars();
+				thesis_detectionOnInputImage_withAllConstellations_withLines_limitInputStars();
+				break;
+			case 444:
+				thesis_detectionOnInputImageFromParameters_withAllConstellations_withLines_limitInputStars();
+				break;
+			case 555:
+				thesis_paramsEvaluationOnFolder_withAllConstellations_withLines_limitInputStars();
 				break;
 		}
 	}
