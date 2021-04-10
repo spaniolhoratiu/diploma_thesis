@@ -6485,7 +6485,10 @@ void thesis_detectionOnInputImage_withAllConstellations_withLines_limitInputStar
 			imshow("Source grayscale", src);
 
 			// TODO: Consider other threshold methods
-			Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
+			//Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
+			Mat thresholdedImage(src.rows, src.cols, CV_8UC1);
+			adaptiveThreshold(src, thresholdedImage, 255, ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 13, 0);
+
 			char buffer[50];
 			sprintf(buffer, "Thresholded at %d", BINARIZATION_THRESHOLD);
 			imshow(buffer, thresholdedImage);
