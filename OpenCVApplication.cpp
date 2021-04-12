@@ -6485,9 +6485,9 @@ void thesis_detectionOnInputImage_withAllConstellations_withLines_limitInputStar
 			imshow("Source grayscale", src);
 
 			// TODO: Consider other threshold methods
-			//Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
-			Mat thresholdedImage(src.rows, src.cols, CV_8UC1);
-			adaptiveThreshold(src, thresholdedImage, 255, ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 13, 0);
+			Mat thresholdedImage = thresholdImage(src, BINARIZATION_THRESHOLD);
+			//Mat thresholdedImage(src.rows, src.cols, CV_8UC1);
+			//adaptiveThreshold(src, thresholdedImage, 255, ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, 13, 0);
 
 			char buffer[50];
 			sprintf(buffer, "Thresholded at %d", BINARIZATION_THRESHOLD);
@@ -6762,7 +6762,7 @@ void thesis_detectionOnInputImage_withAllConstellations_withLines_limitInputStar
 						sprintf(constellationImageFileName, "D://Facultate//AN III//Semester 2//Image Processing//OpenCVApplication-VS2017_OCV340_basic//thesis_data//constellations//png//constellation%d.png", currentConstellationNumber);
 					Mat constellationHighlightedImage = imread(constellationImageFileName, IMREAD_COLOR);
 
-					// Drawing matching triangles
+					// Draw matching triangles
 					line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[0], selectedDetection.trianglePair.inputTriangle.points[1], Vec3b(255, 0, 0), 1);
 					line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[0], selectedDetection.trianglePair.inputTriangle.points[2], Vec3b(0, 255, 0), 1);
 					line(inputHighlightedImage, selectedDetection.trianglePair.inputTriangle.points[1], selectedDetection.trianglePair.inputTriangle.points[2], Vec3b(0, 0, 255), 1);
@@ -6771,10 +6771,10 @@ void thesis_detectionOnInputImage_withAllConstellations_withLines_limitInputStar
 					line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[0], selectedDetection.trianglePair.constellationTriangle.points[2], Vec3b(0, 255, 0), 1);
 					line(constellationHighlightedImage, selectedDetection.trianglePair.constellationTriangle.points[1], selectedDetection.trianglePair.constellationTriangle.points[2], Vec3b(0, 0, 255), 1);
 
-					// Drawing points of warped constellation on input image
+					// Draw points of warped constellation on input image
 					for (Point point : selectedDetection.srcPoints)
 					{
-						circle(inputHighlightedImage, point, 2, Vec3b(0, 0, 255), 3);
+						circle(inputHighlightedImage, point, 7, Vec3b(0, 0, 255), 1);
 					}
 
 					// Draw lines of warped constellation on input image
@@ -7185,7 +7185,7 @@ void thesis_detectionOnInputImageFromParameters_withAllConstellations_withLines_
 				// Drawing points of warped constellation on input image
 				for (Point point : selectedDetection.srcPoints)
 				{
-					circle(inputHighlightedImage, point, 2, Vec3b(0, 0, 255), 3);
+					circle(inputHighlightedImage, point, 7, Vec3b(0, 0, 255), 1);
 				}
 
 				// Draw lines of warped constellation on input image
@@ -7611,7 +7611,7 @@ void thesis_paramsEvaluationOnFolder_withAllConstellations_withLines_limitInputS
 					// Drawing points of warped constellation on input image
 					for (Point point : selectedDetection.srcPoints)
 					{
-						circle(inputHighlightedImage, point, 2, Vec3b(0, 0, 255), 3);
+						circle(inputHighlightedImage, point, 7, Vec3b(0, 0, 255), 1);
 					}
 
 					// Draw lines of warped constellation on input image
