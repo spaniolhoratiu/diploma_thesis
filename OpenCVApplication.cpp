@@ -9219,12 +9219,12 @@ void testConstellationPreprocessingOnSelectedImage()
 		Mat starsOnly = filterForStars(src);
 		imshow("Stars only", starsOnly);
 
-		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 2, WHITE, BLACK);
-		//erosionDilation = dilateNTimesWithParams(erosionDilation, 1, WHITE, BLACK);
-		//erosionDilation = erodeNTimesWithParams(starsOnly, 3, WHITE, BLACK);
+		//Mat erosionDilation = erodeNTimesWithParams(starsOnly, 1, WHITE, BLACK);
+		Mat erosionDilation = dilateNTimesWithParams(starsOnly, 2, WHITE, BLACK);
+		erosionDilation = erodeNTimesWithParams(erosionDilation, 2, WHITE, BLACK);
 		//erosionDilation = dilateNTimesWithParams(erosionDilation, 3, WHITE, BLACK);
 		//imshow("Erosion & Dilation", erosionDilation);
-		Mat erosionDilation = starsOnly;
+		//Mat erosionDilation = starsOnly;
 
 		Mat labels = computeLabelsMatrixBFS(erosionDilation);
 
@@ -9263,7 +9263,7 @@ void testConstellationPreprocessingOnSelectedImage()
 		int firstNb = fname[130] - '0'; // Get "01" from D://...//constellation01.png
 		int secondNb = fname[131] - '0';
 
-		writeConstellationInfoInFile(centerOfMassInformation.points, triangles, firstNb, secondNb);
+		//writeConstellationInfoInFile(centerOfMassInformation.points, triangles, firstNb, secondNb);
 			
 	}
 }
