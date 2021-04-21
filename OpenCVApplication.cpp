@@ -6500,7 +6500,7 @@ void thesis_detectionOnInputImage_withAllConstellations_withLines_limitInputStar
 			std::vector<Vec3b> colorsOfObjects = computeObjectsColorsBlackBackground(labeledImage);
 
 			CenterOfMassInformation centerOfMassInformationGlobal = computeCentersOfMass(labeledImage, colorsOfObjects, GLOBAL_CENTER_OF_MASS_AREA_THRESHOLD);
-			//imshow("Centers of mass", centerOfMassInformation.image);
+			imshow("Centers of mass", centerOfMassInformationGlobal.image);
 			sort(centerOfMassInformationGlobal.stars.begin(), centerOfMassInformationGlobal.stars.end());
 
 			int limitNumberOfBrightestStars = UPPER_LIMIT_INPUT_STARS > centerOfMassInformationGlobal.stars.size() ?
