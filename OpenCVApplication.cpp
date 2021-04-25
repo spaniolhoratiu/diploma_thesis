@@ -9237,6 +9237,20 @@ void testConstellationPreprocessingOnSelectedImage()
 		Mat centerOfMassImage = centerOfMassInformation.image;
 		imshow("Centers of mass", centerOfMassInformation.image);
 
+
+		//Mat inverseCenterOfMassImage(centerOfMassInformation.image.rows, centerOfMassInformation.image.cols, CV_8UC1, Scalar(255, 255, 255));
+		//for (int i = 0; i < inverseCenterOfMassImage.rows; i++)
+		//{
+		//	for (int j = 0; j < inverseCenterOfMassImage.cols; j++)
+		//	{
+		//		if (centerOfMassInformation.image.at<uchar>(i, j) == WHITE)
+		//		{
+		//			circle(inverseCenterOfMassImage, Point(j, i), 1, Vec3b(0, 0, 0), 2);
+		//		}
+		//	}
+		//}
+		//imshow("Center of mass", inverseCenterOfMassImage);
+
 		/*
 		printf("Centers of mass:");
 		for (int i = 0; i < centerOfMassInformation.points.size(); i++)
